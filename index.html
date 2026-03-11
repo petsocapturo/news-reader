@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PANTAU — Berita Pemerintahan Indonesia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --surface2: #1e1e1e;
+      --border: #2a2a2a;
+      --text: #e8e2d9;
+      --muted: #7a7469;
+      --accent: #c9252d;
+      --accent-dim: rgba(201, 37, 45, 0.12);
+      --gold: #c8a96e;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Source Sans 3', system-ui, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      background: rgba(13, 13, 13, 0.95);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1rem 0;
+    }
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      flex-shrink: 0;
+    }
+    .brand-name {
+      font-family: var(--font-serif);
+      font-size: 1.7rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: var(--text);
+    }
+    .brand-dot {
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-bottom: 3px;
+    }
+    .brand-sub {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    /* SEARCH BAR */
+    .search-form {
+      display: flex;
+      gap: 0.5rem;
+      flex: 1;
+      max-width: 520px;
+    }
+    .search-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.55rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 300;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--muted); }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.55rem 1.2rem;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: #a51d24; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* QUICK FILTERS */
+    .quick-filters {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .filter-row {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.55rem 2rem;
+    }
+    .filter-row + .filter-row { border-top: 1px solid var(--border); }
+    .filter-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-right: 0.5rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .filter-chip {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.3rem 0.8rem;
+      font-size: 0.78rem;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .filter-chip:hover, .filter-chip.active {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .source-chip {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.3rem 0.9rem;
+      font-size: 0.78rem;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .source-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.15s; }
+    .source-chip.active { border-color: #22c55e; color: var(--text); }
+    .source-chip.active .dot { background: #22c55e; }
+    .source-chip:hover { border-color: #22c55e55; color: var(--text); }
+
+    /* MAIN */
+    main {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    /* STATUS BAR */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+    }
+    .status-keyword { color: var(--gold); font-weight: 600; }
+    .status-count { }
+    .live-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* LOADING */
+    .loading {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+    }
+    .loading-spinner {
+      width: 32px; height: 32px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ERROR */
+    .error-box {
+      border: 1px solid var(--accent);
+      background: var(--accent-dim);
+      padding: 1rem 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    /* NEWS GRID */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1px;
+      background: var(--border);
+    }
+
+    /* NEWS CARD */
+    .card {
+      background: var(--bg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: background 0.2s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .card:hover { background: var(--surface); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-source {
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.4;
+      color: var(--text);
+      text-decoration: none;
+      display: block;
+    }
+    .card-title:hover { color: var(--gold); }
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    /* SNIPPET */
+    .card-snippet {
+      font-size: 0.85rem;
+      color: #9a9390;
+      line-height: 1.65;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* CARD FOOTER */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.25rem;
+    }
+    .card-date {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .read-link {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: color 0.15s;
+    }
+    .read-link:hover { color: var(--gold); }
+    /* EMPTY STATE */
+    .empty {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+      grid-column: 1/-1;
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 640px) {
+      .header-inner { flex-wrap: wrap; }
+      .search-form { max-width: 100%; order: 3; width: 100%; }
+      main { padding: 0 1rem; }
+      .quick-filters { padding: 0.6rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-name">PANTAU</span>
+      <div class="brand-dot"></div>
+      <span class="brand-sub">Pemerintahan RI</span>
+    </div>
+    <div class="search-form">
+      <input
+        id="searchInput"
+        class="search-input"
+        type="text"
+        placeholder="Cari topik, kementerian, kebijakan..."
+        value="pemerintah Indonesia"
+      />
+      <button class="btn" id="searchBtn" onclick="searchNews()">Cari</button>
+    </div>
+  </div>
+</header>
+
+<div class="quick-filters">
+  <div class="filter-row">
+    <span class="filter-label">Sumber:</span>
+    <button class="source-chip active" data-source="detik.com" onclick="toggleSource(this)">
+      <span class="dot"></span>detik.com
+    </button>
+    <button class="source-chip active" data-source="kompas.com" onclick="toggleSource(this)">
+      <span class="dot"></span>kompas.com
+    </button>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">Topik Cepat:</span>
+    <button class="filter-chip" onclick="quickSearch('Prabowo kebijakan')">Kebijakan</button>
+    <button class="filter-chip" onclick="quickSearch('kementerian Indonesia')">Kementerian</button>
+    <button class="filter-chip" onclick="quickSearch('DPR RI legislasi')">DPR & Legislasi</button>
+    <button class="filter-chip" onclick="quickSearch('APBN anggaran pemerintah')">APBN</button>
+    <button class="filter-chip" onclick="quickSearch('KPK korupsi Indonesia')">KPK & Hukum</button>
+    <button class="filter-chip" onclick="quickSearch('pemilu pilkada Indonesia')">Pemilu</button>
+    <button class="filter-chip" onclick="quickSearch('ekonomi investasi Indonesia')">Ekonomi</button>
+  </div>
+</div>
+
+<main>
+  <div class="status-bar">
+    <span>
+      <span class="live-dot"></span>
+      Google News RSS · Real-time
+    </span>
+    <span id="statusRight">Memuat berita...</span>
+  </div>
+  <div id="newsContainer">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      Mengambil berita terbaru...
+    </div>
+  </div>
+</main>
+
+<footer>
+  PANTAU · Dibuat dengan Netlify Functions & Claude AI · Sumber: Google News
+</footer>
+
+<script>
+  let currentKeyword = 'pemerintah Indonesia';
+  let activeSources = new Set(['detik.com', 'kompas.com']);
+
+  function getSourcesParam() {
+    return [...activeSources].join(',');
+  }
+
+  function toggleSource(btn) {
+    const source = btn.dataset.source;
+    if (activeSources.has(source)) {
+      // Jangan sampai semua sumber dinonaktifkan
+      if (activeSources.size === 1) return;
+      activeSources.delete(source);
+      btn.classList.remove('active');
+    } else {
+      activeSources.add(source);
+      btn.classList.add('active');
+    }
+    fetchNews(currentKeyword);
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+      return new Date(dateStr).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    } catch { return dateStr; }
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  async function fetchNews(keyword) {
+    const container = document.getElementById('newsContainer');
+    const statusRight = document.getElementById('statusRight');
+
+    container.innerHTML = `
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        Mengambil berita untuk "<strong>${escapeHtml(keyword)}</strong>"...
+      </div>`;
+    statusRight.textContent = 'Memuat...';
+
+    try {
+      const res = await fetch(`/.netlify/functions/fetch-news?keyword=${encodeURIComponent(keyword)}&sources=${encodeURIComponent(getSourcesParam())}`);
+      const articles = await res.json();
+
+      if (!Array.isArray(articles) || articles.length === 0) {
+        container.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">📭</div>
+            Tidak ada berita ditemukan untuk kata kunci ini.
+          </div>`;
+        statusRight.textContent = '0 artikel';
+        return;
+      }
+
+      statusRight.textContent = `${articles.length} artikel ditemukan · Kata kunci: "${keyword}"`;
+
+      const grid = document.createElement('div');
+      grid.className = 'news-grid';
+
+      articles.forEach((article, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.animationDelay = `${idx * 0.04}s`;
+
+        card.innerHTML = `
+          <div class="card-source">${escapeHtml(article.source)}</div>
+          <a class="card-title" href="${escapeHtml(article.link)}" target="_blank" rel="noopener">
+            ${escapeHtml(article.title)}
+          </a>
+          ${article.description ? `<p class="card-snippet">${escapeHtml(article.description)}</p>` : ''}
+          <div class="card-footer">
+            <span class="card-date">${formatDate(article.pubDate)}</span>
+            <a class="read-link" href="${escapeHtml(article.link)}" target="_blank" rel="noopener">Baca selengkapnya →</a>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      container.innerHTML = '';
+      container.appendChild(grid);
+
+    } catch (err) {
+      container.innerHTML = `
+        <div class="error-box">
+          ⚠ Gagal mengambil berita. Pastikan app sudah di-deploy ke Netlify.<br/>
+          <small style="color:var(--muted);margin-top:0.5rem;display:block">${err.message}</small>
+        </div>`;
+      statusRight.textContent = 'Error';
+    }
+  }
+
+  function searchNews() {
+    const input = document.getElementById('searchInput');
+    const keyword = input.value.trim();
+    if (!keyword) return;
+    currentKeyword = keyword;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    fetchNews(keyword);
+  }
+
+  function quickSearch(keyword) {
+    document.getElementById('searchInput').value = keyword;
+    currentKeyword = keyword;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    fetchNews(keyword);
+  }
+
+  document.getElementById('searchInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') searchNews();
+  });
+
+  // Load on start
+  fetchNews(currentKeyword);
+</script>
+</body>
+</html>
