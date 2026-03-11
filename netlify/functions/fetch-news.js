@@ -12,6 +12,23 @@ exports.handler = async (event) => {
   const encodedKeyword = encodeURIComponent(fullQuery);
   const url = `https://news.google.com/rss/search?q=${encodedKeyword}&hl=id&gl=ID&ceid=ID:id`;
 
+  function cleanText(raw) {
+    // 1. Decode HTML entities (termasuk yang sudah di-encode di dalam RSS)
+    let text = raw
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
+    // 2. Strip semua tag HTML
+    text = text.replace(/<[^>]+>/g, ' ');
+    // 3. Decode entitas yang mungkin tersisa setelah tag dibuang
+    text = text
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
+    // 4. Rapikan whitespace
+    return text.replace(/\s+/g, ' ').trim();
+  }
+
   try {
     const response = await fetch(url);
     const xml = await response.text();
@@ -22,10 +39,10 @@ exports.handler = async (event) => {
     for (const match of itemMatches) {
       const itemXml = match[1];
 
-      const title = (
+      const rawTitle =
         itemXml.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] ||
-        itemXml.match(/<title>(.*?)<\/title>/)?.[1] || ''
-      ).replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+        itemXml.match(/<title>(.*?)<\/title>/)?.[1] || '';
+      const title = cleanText(rawTitle);
 
       const link = itemXml.match(/<link>(.*?)<\/link>/)?.[1] || '';
       const pubDate = itemXml.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || '';
@@ -34,7 +51,7 @@ exports.handler = async (event) => {
       const rawDesc =
         itemXml.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/)?.[1] ||
         itemXml.match(/<description>([\s\S]*?)<\/description>/)?.[1] || '';
-      const description = rawDesc.replace(/<[^>]+>/g, '').trim().substring(0, 400);
+      const description = cleanText(rawDesc).substring(0, 400);
 
       if (title) items.push({ title, link, pubDate, source, description });
     }
