@@ -180,7 +180,7 @@
     .cal-day:hover:not(.empty):not(.disabled) { background: var(--surface2); color: var(--text); }
     .cal-day.empty { cursor: default; }
     /* FIX 2: Hide future days cleanly instead of 0.25 opacity invisible */
-   .cal-day.future { visibility: hidden; cursor: default; pointer-events: none; }
+    .cal-day.disabled { opacity: 0; cursor: default; pointer-events: none; }
     .cal-day.today { color: var(--gold); }
     .cal-day.in-range { background: rgba(200,169,110,0.15); color: var(--text); border-radius: 0; }
     .cal-day.range-start, .cal-day.range-end {
@@ -675,50 +675,57 @@ function calNav(dir) {
 
   calMonth = newMonth;
   calYear  = newYear;
- function renderCal() {
-  const now    = new Date();
-  const todayY = now.getFullYear();
-  const todayM = now.getMonth();
-  const todayD = now.getDate();
+  renderCal();
+}
 
-  document.getElementById('calMonthLabel').textContent = MONTHS_ID[calMonth] + ' ' + calYear;
-  document.getElementById('calNext').disabled = (calYear === todayY && calMonth === todayM);
+function renderCal() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayYear  = today.getFullYear();
+  const todayMonth = today.getMonth();
 
-  const grid        = document.getElementById('calGrid');
+  document.getElementById('calMonthLabel').textContent =
+    MONTHS_ID[calMonth] + ' ' + calYear;
+
+  // FIX: Disable next-month nav button if already at current month
+  const nextBtn = document.getElementById('calNext');
+  const atCurrentMonth = (calYear === todayYear && calMonth === todayMonth);
+  nextBtn.disabled = atCurrentMonth;
+
+  const grid = document.getElementById('calGrid');
+  let html = DAYS_ID.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
   const firstDow    = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-
-  let html = DAYS_ID.map(d => `<div class="cal-day-name">${d}</div>`).join('');
 
   for (let i = 0; i < firstDow; i++) html += `<div class="cal-day empty"></div>`;
 
   for (let d = 1; d <= daysInMonth; d++) {
-    // Pure integer comparison — no Date objects, no timezone issues
-    const isFuture = (calYear > todayY)
-      || (calYear === todayY && calMonth > todayM)
-      || (calYear === todayY && calMonth === todayM && d > todayD);
+    const date = new Date(calYear, calMonth, d);
+    date.setHours(0, 0, 0, 0);
+    const isFuture = date > today;
 
+    let cls = 'cal-day';
     if (isFuture) {
-      html += `<div class="cal-day future"></div>`;
-      continue;
-    }
+      cls += ' disabled';
+    } else {
+      if (date.getTime() === today.getTime()) cls += ' today';
 
-    const isToday = (calYear === todayY && calMonth === todayM && d === todayD);
-    const date    = new Date(calYear, calMonth, d, 0, 0, 0, 0);
-    let cls = 'cal-day' + (isToday ? ' today' : '');
-
-    if (selStart && selEnd) {
-      const lo = selStart <= selEnd ? selStart : selEnd;
-      const hi = selStart <= selEnd ? selEnd   : selStart;
-      if      (date.getTime() === lo.getTime()) cls += ' range-start';
-      else if (date.getTime() === hi.getTime()) cls += ' range-end';
-      else if (date > lo && date < hi)          cls += ' in-range';
-    } else if (selStart && date.getTime() === selStart.getTime()) {
-      cls += ' single-sel';
+      if (selStart && selEnd) {
+        const lo = selStart <= selEnd ? selStart : selEnd;
+        const hi = selStart <= selEnd ? selEnd   : selStart;
+        if (date.getTime() === lo.getTime()) cls += ' range-start';
+        else if (date.getTime() === hi.getTime()) cls += ' range-end';
+        else if (date > lo && date < hi) cls += ' in-range';
+      } else if (selStart && date.getTime() === selStart.getTime()) {
+        cls += ' single-sel';
+      }
     }
 
     const ds = `${calYear},${calMonth},${d}`;
-    html += `<button class="${cls}" onclick="calClick(${ds})" onmouseenter="calHover(${ds})">${d}</button>`;
+    html += `<button class="${cls}"
+               onclick="calClick(${ds})"
+               onmouseenter="calHover(${ds})">${d}</button>`;
   }
 
   grid.innerHTML = html;
