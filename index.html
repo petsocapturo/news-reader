@@ -52,6 +52,18 @@
     .brand-name { font-family: var(--font-serif); font-size: 1.7rem; font-weight: 900; letter-spacing: 0.12em; }
     .brand-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; margin-bottom: 3px; }
     .brand-sub { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+
+    /* FIX 1: Nav links */
+    .nav-links { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; }
+    .nav-link {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.35rem 0.75rem; border: 1px solid transparent;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .nav-link:hover { color: var(--text); border-color: var(--border); }
+    .nav-link.active { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+
     .search-form { display: flex; gap: 0.5rem; flex: 1; max-width: 520px; }
     .search-input {
       flex: 1; background: var(--surface2);
@@ -70,8 +82,14 @@
     }
     .btn:hover { background: #a51d24; }
 
-    /* ── FILTER BAR ──────────────────────────────────────────────────── */
-    .filter-bar { background: var(--surface); border-bottom: 1px solid var(--border); }
+    /* ── FILTER BAR — FIX 3: Sticky ────────────────────────────────── */
+    .filter-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      /* top set by JS after measuring header height */
+      z-index: 150;
+    }
     .filter-row {
       max-width: 1100px; margin: 0 auto;
       display: flex; gap: 0.45rem; align-items: center;
@@ -138,7 +156,8 @@
       cursor: pointer; font-size: 1rem; padding: 0.2rem 0.5rem;
       transition: color 0.15s;
     }
-    .cal-nav:hover { color: var(--text); }
+    .cal-nav:hover:not(:disabled) { color: var(--text); }
+    .cal-nav:disabled { opacity: 0.2; cursor: default; }
     .cal-month-label {
       font-size: 0.85rem; font-weight: 600; color: var(--text); letter-spacing: 0.05em;
     }
@@ -160,7 +179,8 @@
     }
     .cal-day:hover:not(.empty):not(.disabled) { background: var(--surface2); color: var(--text); }
     .cal-day.empty { cursor: default; }
-    .cal-day.disabled { opacity: 0.25; cursor: default; }
+    /* FIX 2: Hide future days cleanly instead of 0.25 opacity invisible */
+    .cal-day.disabled { opacity: 0; cursor: default; pointer-events: none; }
     .cal-day.today { color: var(--gold); }
     .cal-day.in-range { background: rgba(200,169,110,0.15); color: var(--text); border-radius: 0; }
     .cal-day.range-start, .cal-day.range-end {
@@ -186,10 +206,18 @@
 
     /* ── MAIN ────────────────────────────────────────────────────────── */
     main { max-width: 1100px; margin: 2rem auto; padding: 0 2rem; }
+
+    /* FIX 3: Status bar sticky */
     .status-bar {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 1.5rem; font-size: 0.78rem; color: var(--muted);
       border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; gap: 1rem;
+      position: sticky;
+      /* top set by JS */
+      z-index: 90;
+      background: var(--bg);
+      padding-top: 0.75rem;
+      margin-top: -0.75rem;
     }
     .live-dot {
       display: inline-block; width: 6px; height: 6px;
@@ -251,6 +279,7 @@
     @media (max-width: 640px) {
       .header-inner { flex-wrap: wrap; }
       .search-form { max-width: 100%; order: 3; width: 100%; }
+      .nav-links { order: 2; }
       main { padding: 0 1rem; }
       .filter-row { padding: 0.5rem 1rem; }
     }
@@ -265,10 +294,13 @@
       <div class="brand-dot"></div>
       <span class="brand-sub">Pemerintahan RI</span>
     </div>
-     <div style="display:flex;gap:0.5rem;align-items:center;flex-shrink:0">
-      <a href="/" style="color:var(--muted);text-decoration:none;font-size:0.8rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 0.8rem;border:1px solid var(--border);transition:all 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Berita</a>
-      <a href="/formatter.html" style="color:var(--gold);text-decoration:none;font-size:0.8rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 0.8rem;border:1px solid var(--gold);background:var(--gold-dim);transition:all 0.15s">Formatter</a>
+
+    <!-- FIX 1: Nav links — active state set by JS -->
+    <div class="nav-links">
+      <a class="nav-link" id="navBerita" href="/">Berita</a>
+      <a class="nav-link" id="navFormatter" href="/formatter.html">Formatter</a>
     </div>
+
     <div class="search-form">
       <input id="searchInput" class="search-input" type="text"
         placeholder="Cari topik, kementerian, kebijakan..."
@@ -278,7 +310,7 @@
   </div>
 </header>
 
-<div class="filter-bar">
+<div class="filter-bar" id="filterBar">
   <!-- ROW 1: Sumber -->
   <div class="filter-row">
     <span class="filter-label">Sumber:</span>
@@ -317,9 +349,9 @@
 <div class="cal-overlay" id="calOverlay" onclick="handleOverlayClick(event)">
   <div class="cal-popover" id="calPopover" onclick="event.stopPropagation()">
     <div class="cal-header">
-      <button class="cal-nav" onclick="calNav(-1)">‹</button>
+      <button class="cal-nav" id="calPrev" onclick="calNav(-1)">‹</button>
       <span class="cal-month-label" id="calMonthLabel"></span>
-      <button class="cal-nav" onclick="calNav(1)">›</button>
+      <button class="cal-nav" id="calNext" onclick="calNav(1)">›</button>
     </div>
     <div class="cal-mode-hint" id="calModeHint">Klik satu tanggal atau drag untuk rentang</div>
     <div class="cal-grid" id="calGrid"></div>
@@ -332,7 +364,7 @@
 </div>
 
 <main>
-  <div class="status-bar">
+  <div class="status-bar" id="statusBar">
     <span><span class="live-dot"></span>Google News RSS · Real-time</span>
     <span id="statusRight">Memuat berita...</span>
     <span style="display:flex;gap:0.4rem;flex-shrink:0">
@@ -359,22 +391,46 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
+// FIX 1: Active nav detection
+// ═══════════════════════════════════════════════════════════════════
+(function() {
+  const path = window.location.pathname;
+  const isFormatter = path.includes('formatter');
+  document.getElementById('navBerita').classList.toggle('active', !isFormatter);
+  document.getElementById('navFormatter').classList.toggle('active', isFormatter);
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// FIX 3: Sticky positions — calculated after fonts/layout settle
+// ═══════════════════════════════════════════════════════════════════
+function updateStickyPositions() {
+  const headerH = document.querySelector('header').offsetHeight;
+  const filterBar = document.getElementById('filterBar');
+  filterBar.style.top = headerH + 'px';
+  const filterH = filterBar.offsetHeight;
+  const statusBar = document.getElementById('statusBar');
+  statusBar.style.top = (headerH + filterH) + 'px';
+}
+window.addEventListener('load', updateStickyPositions);
+window.addEventListener('resize', updateStickyPositions);
+// Run immediately too in case fonts are cached
+updateStickyPositions();
+
+// ═══════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════
 let baseKeyword   = 'pemerintah Indonesia';
-let activeCats    = new Set();   // multi-select kategori
+let activeCats    = new Set();
 let activeSources = new Set(['detik.com','kompas.com','kumparan.com','liputan6.com','tempo.co']);
 let allArticles   = [];
-
-// Date filter state
-let dateFrom = null;  // Date object or null
-let dateTo   = null;  // Date object or null (same as dateFrom for single day)
+let dateFrom = null;
+let dateTo   = null;
 
 // ═══════════════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════════════
-function esc(str = '') {
-  return String(str)
+function esc(str) {
+  return String(str || '')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -390,12 +446,6 @@ function fmt(dateStr) {
 function fmtShort(d) {
   if (!d) return '';
   return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
-}
-function startOfDay(d) {
-  const r = new Date(d); r.setHours(0,0,0,0); return r;
-}
-function endOfDay(d) {
-  const r = new Date(d); r.setHours(23,59,59,999); return r;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -415,7 +465,7 @@ function toggleSource(btn) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// CATEGORY TOGGLE (multi-select)
+// CATEGORY TOGGLE
 // ═══════════════════════════════════════════════════════════════════
 function toggleCat(btn) {
   const kw = btn.dataset.keyword;
@@ -429,12 +479,8 @@ function toggleCat(btn) {
   loadNews();
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// BUILD KEYWORD
-// ═══════════════════════════════════════════════════════════════════
 function buildKeyword() {
   if (activeCats.size === 0) return baseKeyword;
-  // Gabungkan semua kategori aktif dengan OR
   return [...activeCats].join(' OR ');
 }
 
@@ -457,21 +503,13 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
 // RESET & REFRESH
 // ═══════════════════════════════════════════════════════════════════
 function resetAll() {
-  // Reset sources
   activeSources = new Set(['detik.com','kompas.com','kumparan.com','liputan6.com','tempo.co']);
   document.querySelectorAll('.source-chip').forEach(b => b.classList.add('active'));
-
-  // Reset kategori
   activeCats.clear();
   document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
-
-  // Reset tanggal
   clearDate();
-
-  // Reset search input
   baseKeyword = 'pemerintah Indonesia';
   document.getElementById('searchInput').value = baseKeyword;
-
   loadNews();
 }
 
@@ -489,8 +527,8 @@ function refreshNews() {
 // FETCH
 // ═══════════════════════════════════════════════════════════════════
 async function loadNews() {
-  const keyword = buildKeyword();
-  const sources = [...activeSources].join(',');
+  const keyword     = buildKeyword();
+  const sources     = [...activeSources].join(',');
   const container   = document.getElementById('newsContainer');
   const statusRight = document.getElementById('statusRight');
 
@@ -498,24 +536,20 @@ async function loadNews() {
   statusRight.textContent = 'Memuat...';
 
   try {
-    // Format tanggal ke YYYY-MM-DD untuk query Google News
-  function toYMD(d) {
-    if (!d) return '';
-    return d.getFullYear() + '-' +
-      String(d.getMonth()+1).padStart(2,'0') + '-' +
-      String(d.getDate()).padStart(2,'0');
-  }
+    function toYMD(d) {
+      if (!d) return '';
+      return d.getFullYear() + '-' +
+        String(d.getMonth()+1).padStart(2,'0') + '-' +
+        String(d.getDate()).padStart(2,'0');
+    }
+    const beforeDate = dateTo ? new Date(dateTo.getTime() + 86400000) : null;
+    let fetchUrl = `/.netlify/functions/fetch-news` +
+      `?keyword=${encodeURIComponent(keyword)}` +
+      `&sources=${encodeURIComponent(sources)}`;
+    if (dateFrom) fetchUrl += `&dateFrom=${toYMD(dateFrom)}`;
+    if (beforeDate) fetchUrl += `&dateTo=${toYMD(beforeDate)}`;
 
-  // before: harus 1 hari setelah dateTo agar inklusif
-  const beforeDate = dateTo ? new Date(dateTo.getTime() + 86400000) : null;
-
-  let fetchUrl = `/.netlify/functions/fetch-news` +
-    `?keyword=${encodeURIComponent(keyword)}` +
-    `&sources=${encodeURIComponent(sources)}`;
-  if (dateFrom) fetchUrl += `&dateFrom=${toYMD(dateFrom)}`;
-  if (beforeDate) fetchUrl += `&dateTo=${toYMD(beforeDate)}`;
-
-  const res = await fetch(fetchUrl);
+    const res = await fetch(fetchUrl);
     allArticles = await res.json();
     if (!Array.isArray(allArticles)) allArticles = [];
     renderArticles();
@@ -530,16 +564,13 @@ async function loadNews() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// RENDER (date filter + sort client-side)
+// RENDER
 // ═══════════════════════════════════════════════════════════════════
 function renderArticles() {
   const container   = document.getElementById('newsContainer');
   const statusRight = document.getElementById('statusRight');
 
-  // Tanggal sudah difilter di backend — tidak perlu filter lagi di sini
   let filtered = [...allArticles];
-
-  // Sort terbaru → terlama
   filtered.sort((a, b) => {
     const ta = new Date(a.pubDate).getTime() || 0;
     const tb = new Date(b.pubDate).getTime() || 0;
@@ -566,7 +597,6 @@ function renderArticles() {
 
   const grid = document.createElement('div');
   grid.className = 'news-grid';
-
   filtered.forEach((article, idx) => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -584,41 +614,35 @@ function renderArticles() {
     `;
     grid.appendChild(card);
   });
-
   container.innerHTML = '';
   container.appendChild(grid);
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// CALENDAR
+// FIX 2: CALENDAR — prevent future month nav, fix disabled rendering
 // ═══════════════════════════════════════════════════════════════════
 const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni',
                    'Juli','Agustus','September','Oktober','November','Desember'];
 const DAYS_ID   = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
 
 let calYear, calMonth;
-let selStart = null;   // Date during selection (first click)
-let selEnd   = null;   // Date during selection (hover or second click)
-let selecting = false; // true = waiting for second click
+let selStart = null;
+let selEnd   = null;
+let selecting = false;
 
 function openCal(e) {
-  const overlay  = document.getElementById('calOverlay');
-  const popover  = document.getElementById('calPopover');
-  const trigger  = document.getElementById('dateTrigger');
-  const rect     = trigger.getBoundingClientRect();
-
-  // Position below trigger
-  const top  = rect.bottom + 6;
-  const left = Math.min(rect.left, window.innerWidth - 300);
+  const overlay = document.getElementById('calOverlay');
+  const popover = document.getElementById('calPopover');
+  const trigger = document.getElementById('dateTrigger');
+  const rect    = trigger.getBoundingClientRect();
+  const top     = rect.bottom + 6;
+  const left    = Math.min(rect.left, window.innerWidth - 300);
   popover.style.top  = top + 'px';
   popover.style.left = left + 'px';
 
-  // Init to current month
   const today = new Date();
   calYear  = today.getFullYear();
   calMonth = today.getMonth();
-
-  // Pre-select if already set
   selStart = dateFrom ? new Date(dateFrom) : null;
   selEnd   = dateTo   ? new Date(dateTo)   : null;
   selecting = false;
@@ -626,44 +650,65 @@ function openCal(e) {
   overlay.classList.add('open');
   renderCal();
 }
+
 function closeCal() {
   document.getElementById('calOverlay').classList.remove('open');
   selecting = false;
 }
+
 function handleOverlayClick(e) {
   if (e.target === document.getElementById('calOverlay')) closeCal();
 }
 
 function calNav(dir) {
-  calMonth += dir;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  const today = new Date();
+  const todayYear  = today.getFullYear();
+  const todayMonth = today.getMonth();
+
+  let newMonth = calMonth + dir;
+  let newYear  = calYear;
+  if (newMonth > 11) { newMonth = 0;  newYear++; }
+  if (newMonth < 0)  { newMonth = 11; newYear--; }
+
+  // FIX: Block navigation to future months
+  if (newYear > todayYear || (newYear === todayYear && newMonth > todayMonth)) return;
+
+  calMonth = newMonth;
+  calYear  = newYear;
   renderCal();
 }
 
 function renderCal() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayYear  = today.getFullYear();
+  const todayMonth = today.getMonth();
+
   document.getElementById('calMonthLabel').textContent =
     MONTHS_ID[calMonth] + ' ' + calYear;
 
-  const today = new Date(); today.setHours(0,0,0,0);
-  const grid  = document.getElementById('calGrid');
+  // FIX: Disable next-month nav button if already at current month
+  const nextBtn = document.getElementById('calNext');
+  const atCurrentMonth = (calYear === todayYear && calMonth === todayMonth);
+  nextBtn.disabled = atCurrentMonth;
 
-  // Day headers
+  const grid = document.getElementById('calGrid');
   let html = DAYS_ID.map(d => `<div class="cal-day-name">${d}</div>`).join('');
 
-  // First day of month
-  const first = new Date(calYear, calMonth, 1).getDay();
-  for (let i = 0; i < first; i++) html += `<div class="cal-day empty"></div>`;
-
+  const firstDow    = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+  for (let i = 0; i < firstDow; i++) html += `<div class="cal-day empty"></div>`;
 
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(calYear, calMonth, d);
+    date.setHours(0, 0, 0, 0);
     const isFuture = date > today;
 
     let cls = 'cal-day';
-    if (isFuture) { cls += ' disabled'; }
-    else {
+    if (isFuture) {
+      cls += ' disabled';
+    } else {
       if (date.getTime() === today.getTime()) cls += ' today';
 
       if (selStart && selEnd) {
@@ -678,7 +723,7 @@ function renderCal() {
     }
 
     const ds = `${calYear},${calMonth},${d}`;
-    html += `<button class="${cls}" ${isFuture ? 'disabled' : ''}
+    html += `<button class="${cls}"
                onclick="calClick(${ds})"
                onmouseenter="calHover(${ds})">${d}</button>`;
   }
@@ -689,22 +734,15 @@ function renderCal() {
 
 function calClick(y, m, d) {
   const clicked = new Date(y, m, d);
+  clicked.setHours(0, 0, 0, 0);
 
   if (!selecting || !selStart) {
-    // First click
     selStart  = clicked;
     selEnd    = null;
     selecting = true;
   } else {
-    // Second click
-    if (clicked.getTime() === selStart.getTime()) {
-      // Same day → single date
-      selEnd    = clicked;
-      selecting = false;
-    } else {
-      selEnd    = clicked;
-      selecting = false;
-    }
+    selEnd    = clicked;
+    selecting = false;
   }
   renderCal();
 }
@@ -712,6 +750,7 @@ function calClick(y, m, d) {
 function calHover(y, m, d) {
   if (!selecting || !selStart) return;
   selEnd = new Date(y, m, d);
+  selEnd.setHours(0, 0, 0, 0);
   renderCal();
 }
 
@@ -728,11 +767,9 @@ function updateCalFooter() {
   } else {
     const lo = selStart <= selEnd ? selStart : selEnd;
     const hi = selStart <= selEnd ? selEnd   : selStart;
-    if (lo.getTime() === hi.getTime()) {
-      info.textContent = fmtShort(lo);
-    } else {
-      info.textContent = `${fmtShort(lo)} – ${fmtShort(hi)}`;
-    }
+    info.textContent = lo.getTime() === hi.getTime()
+      ? fmtShort(lo)
+      : `${fmtShort(lo)} – ${fmtShort(hi)}`;
     hint.textContent = 'Klik Apply atau pilih ulang';
   }
 }
@@ -746,15 +783,12 @@ function applyDate() {
   dateFrom = new Date(lo); dateFrom.setHours(0,0,0,0);
   dateTo   = new Date(hi); dateTo.setHours(23,59,59,999);
 
-  // Update trigger label
-  const trigger = document.getElementById('dateTrigger');
-  const label   = document.getElementById('dateLabel');
-  if (dateFrom.getTime() === dateTo.getTime() - 86399999) {
-    label.textContent = fmtShort(dateFrom);
-  } else {
-    label.textContent = `${fmtShort(dateFrom)} – ${fmtShort(dateTo)}`;
-  }
-  trigger.classList.add('has-date');
+  const label = document.getElementById('dateLabel');
+  label.textContent = dateFrom.getTime() === (dateTo.getTime() - 86399999)
+    ? fmtShort(dateFrom)
+    : `${fmtShort(dateFrom)} – ${fmtShort(dateTo)}`;
+
+  document.getElementById('dateTrigger').classList.add('has-date');
   document.getElementById('dateClear').style.display = 'inline';
 
   closeCal();
