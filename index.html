@@ -87,7 +87,7 @@
     .cal-day-name { font-size: 0.65rem; color: var(--muted); text-align: center; padding: 0.2rem 0; letter-spacing: 0.05em; text-transform: uppercase; }
     .cal-day { font-size: 0.78rem; text-align: center; padding: 0.35rem 0; cursor: pointer; border-radius: 2px; transition: all 0.1s; color: var(--muted); background: transparent; border: none; font-family: var(--font-sans); }
     .cal-day:hover:not(.empty):not(.disabled) { background: var(--surface2); color: var(--text); }
-    .cal-day.empty { cursor: default; }
+    .cal-day.cal-empty { cursor: default; background: transparent; }
     /* FIXED: Jangan opacity 0 agar elemen tanggal tidak hilang, beri 0.25 dan disable cursor */
     .cal-day.disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
     .cal-day.today { color: var(--gold); }
@@ -845,7 +845,7 @@ function renderCal() {
   const firstDow    = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
 
-  for (let i = 0; i < firstDow; i++) html += `<div class="cal-day empty"></div>`;
+  for (let i = 0; i < firstDow; i++) html += `<div class="cal-day cal-empty"></div>`;
 
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(calYear, calMonth, d); date.setHours(0,0,0,0);
