@@ -88,7 +88,8 @@
     .cal-day { font-size: 0.78rem; text-align: center; padding: 0.35rem 0; cursor: pointer; border-radius: 2px; transition: all 0.1s; color: var(--muted); background: transparent; border: none; font-family: var(--font-sans); }
     .cal-day:hover:not(.empty):not(.disabled) { background: var(--surface2); color: var(--text); }
     .cal-day.empty { cursor: default; }
-    .cal-day.disabled { opacity: 0; cursor: default; pointer-events: none; }
+    /* FIXED: Jangan opacity 0 agar elemen tanggal tidak hilang, beri 0.25 dan disable cursor */
+    .cal-day.disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
     .cal-day.today { color: var(--gold); }
     .cal-day.in-range { background: rgba(200,169,110,0.15); color: var(--text); border-radius: 0; }
     .cal-day.range-start, .cal-day.range-end { background: var(--gold); color: #111; font-weight: 600; border-radius: 2px; }
@@ -197,6 +198,14 @@
     /* Progress batch info */
     .batch-info { font-size: 0.72rem; color: var(--gold); margin-top: 0.5rem; }
 
+    /* ── PAGINATION ── */
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 0.4rem; margin-top: 2rem; padding: 1rem 0; }
+    .page-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 0.4rem 0.8rem; font-size: 0.85rem; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; border-radius: 2px; }
+    .page-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--text); }
+    .page-btn.active { background: var(--gold); border-color: var(--gold); color: #111; font-weight: 600; }
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .page-dots { color: var(--muted); padding: 0 0.2rem; }
+
     @media (max-width: 640px) {
       .header-inner { flex-wrap: wrap; }
       .search-form { max-width: 100%; order: 3; width: 100%; }
@@ -231,17 +240,14 @@
 </header>
 
 <div class="filter-bar" id="filterBar">
-  <!-- ROW 1: Sumber (dynamic) -->
   <div class="filter-row">
     <span class="filter-label">Sumber:</span>
     <div id="sourceChipsContainer" style="display:flex;gap:0.45rem;flex-wrap:wrap;align-items:center"></div>
   </div>
-  <!-- ROW 2: Kategori (dynamic) -->
   <div class="filter-row">
     <span class="filter-label">Kategori:</span>
     <div id="catChipsContainer" style="display:flex;gap:0.45rem;flex-wrap:wrap;align-items:center"></div>
   </div>
-  <!-- ROW 3: Tanggal -->
   <div class="filter-row">
     <span class="filter-label">Tanggal:</span>
     <button class="date-trigger" id="dateTrigger" onclick="openCal(event)">
@@ -253,7 +259,6 @@
   </div>
 </div>
 
-<!-- Calendar overlay -->
 <div class="cal-overlay" id="calOverlay" onclick="handleOverlayClick(event)">
   <div class="cal-popover" id="calPopover" onclick="event.stopPropagation()">
     <div class="cal-header">
@@ -271,7 +276,6 @@
   </div>
 </div>
 
-<!-- Settings Panel -->
 <div class="settings-overlay" id="settingsOverlay" onclick="handleSettingsOverlay(event)">
   <div class="settings-panel" onclick="event.stopPropagation()">
     <div class="settings-head">
@@ -279,8 +283,6 @@
       <button class="settings-close" onclick="closeSettings()">✕</button>
     </div>
     <div class="settings-body">
-
-      <!-- SUMBER BERITA -->
       <div>
         <div class="settings-section-title">Sumber Berita</div>
         <div class="settings-items" id="settingsSources"></div>
@@ -289,8 +291,6 @@
           <button class="settings-add-btn" onclick="addSource()">+ Tambah Sumber</button>
         </div>
       </div>
-
-      <!-- KATEGORI / KEYWORD -->
       <div>
         <div class="settings-section-title">Kategori / Keyword</div>
         <div class="settings-items" id="settingsKeywords"></div>
@@ -300,12 +300,9 @@
           <button class="settings-add-btn" onclick="addKeyword()">+ Tambah Keyword</button>
         </div>
       </div>
-
-      <!-- INFO -->
       <div style="font-size:0.75rem;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);padding-top:1rem">
         Perubahan disimpan otomatis di browser. Untuk berbagi konfigurasi ke perangkat lain, gunakan tombol Reset dan entry ulang manual.
       </div>
-
     </div>
     <div class="settings-footer">
       <button class="settings-reset-btn" onclick="resetToDefaults()">↺ Reset ke Konfigurasi Default</button>
@@ -347,7 +344,7 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-// ACTIVE NAV
+// ACTIVE NAV & STICKY POSITIONS
 // ═══════════════════════════════════════════════════════════════════
 (function() {
   const path = window.location.pathname;
@@ -355,9 +352,6 @@
   document.getElementById('navFormatter').classList.toggle('active', path.includes('formatter'));
 })();
 
-// ═══════════════════════════════════════════════════════════════════
-// STICKY POSITIONS
-// ═══════════════════════════════════════════════════════════════════
 function updateStickyPositions() {
   const headerH = document.querySelector('header').offsetHeight;
   const filterBar = document.getElementById('filterBar');
@@ -370,7 +364,7 @@ window.addEventListener('resize', updateStickyPositions);
 updateStickyPositions();
 
 // ═══════════════════════════════════════════════════════════════════
-// CONFIG — localStorage persistence
+// CONFIG
 // ═══════════════════════════════════════════════════════════════════
 const DEFAULT_SOURCES = ['detik.com','kompas.com','kumparan.com','liputan6.com','tempo.co'];
 const DEFAULT_KEYWORDS = [
@@ -414,6 +408,10 @@ let allArticles   = [];
 let dateFrom = null;
 let dateTo   = null;
 
+// Pagination variables
+let currentPage = 1;
+const ITEMS_PER_PAGE = 50;
+
 // ═══════════════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════════════
@@ -436,7 +434,7 @@ function toYMD(d) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// RENDER CHIPS (dynamic from config)
+// RENDER CHIPS
 // ═══════════════════════════════════════════════════════════════════
 function renderSourceChips() {
   const container = document.getElementById('sourceChipsContainer');
@@ -466,9 +464,6 @@ function renderCatChips() {
   updateStickyPositions();
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// SOURCE / CATEGORY TOGGLE
-// ═══════════════════════════════════════════════════════════════════
 function toggleSource(btn) {
   const src = btn.dataset.source;
   if (activeSources.has(src)) {
@@ -531,14 +526,12 @@ function refreshNews() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// MULTI-WINDOW DATE RANGE SPLIT (for >100 articles)
+// FETCH LOGIC
 // ═══════════════════════════════════════════════════════════════════
 function buildDateWindows(from, to, windowDays) {
   const windows = [];
-  let cur = new Date(from);
-  cur.setHours(0,0,0,0);
-  const end = new Date(to);
-  end.setHours(23,59,59,999);
+  let cur = new Date(from); cur.setHours(0,0,0,0);
+  const end = new Date(to); end.setHours(23,59,59,999);
 
   while (cur <= end) {
     const winEnd = new Date(cur);
@@ -552,7 +545,6 @@ function buildDateWindows(from, to, windowDays) {
 }
 
 async function fetchBatch(keyword, sources, winFrom, winTo) {
-  // winTo passed as the day-after (exclusive) to backend
   const beforeDate = new Date(winTo.getTime() + 86400000);
   let url = `/.netlify/functions/fetch-news?keyword=${encodeURIComponent(keyword)}&sources=${encodeURIComponent(sources)}`;
   url += `&dateFrom=${toYMD(winFrom)}&dateTo=${toYMD(beforeDate)}`;
@@ -563,10 +555,9 @@ async function fetchBatch(keyword, sources, winFrom, winTo) {
   } catch { return []; }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// FETCH ORCHESTRATOR
-// ═══════════════════════════════════════════════════════════════════
 async function loadNews() {
+  currentPage = 1; // Reset halaman pagination setiap kali fetch baru
+  
   const keyword     = buildKeyword();
   const sources     = [...activeSources].join(',');
   const container   = document.getElementById('newsContainer');
@@ -581,34 +572,24 @@ async function loadNews() {
 
   try {
     if (dateFrom && dateTo) {
-      // ── Multi-window fetch ───────────────────────────────────────
       const rangeDays = Math.ceil((dateTo.getTime() - dateFrom.getTime()) / 86400000) + 1;
-
       if (rangeDays > 7) {
-        // Split into 7-day batches for volume > 100
         const windows = buildDateWindows(dateFrom, dateTo, 7);
         batchEl.style.display = 'inline';
-
         const seen = new Set();
         const accumulated = [];
 
         for (let i = 0; i < windows.length; i++) {
           batchEl.textContent = `Mengambil batch ${i+1}/${windows.length}...`;
           statusRight.textContent = `Batch ${i+1}/${windows.length} · ${accumulated.length} artikel terkumpul`;
-
           const data = await fetchBatch(keyword, sources, windows[i].from, windows[i].to);
           for (const item of data) {
-            if (!seen.has(item.link)) {
-              seen.add(item.link);
-              accumulated.push(item);
-            }
+            if (!seen.has(item.link)) { seen.add(item.link); accumulated.push(item); }
           }
         }
-
         batchEl.style.display = 'none';
         allArticles = accumulated;
       } else {
-        // Single fetch with date params
         const beforeDate = new Date(dateTo.getTime() + 86400000);
         let url = `/.netlify/functions/fetch-news?keyword=${encodeURIComponent(keyword)}&sources=${encodeURIComponent(sources)}`;
         url += `&dateFrom=${toYMD(dateFrom)}&dateTo=${toYMD(beforeDate)}`;
@@ -617,7 +598,6 @@ async function loadNews() {
         if (!Array.isArray(allArticles)) allArticles = [];
       }
     } else {
-      // ── No date filter: single fetch ─────────────────────────────
       const url = `/.netlify/functions/fetch-news?keyword=${encodeURIComponent(keyword)}&sources=${encodeURIComponent(sources)}`;
       const res = await fetch(url);
       allArticles = await res.json();
@@ -637,7 +617,7 @@ async function loadNews() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// RENDER ARTICLES
+// RENDER ARTICLES (WITH PAGINATION)
 // ═══════════════════════════════════════════════════════════════════
 function renderArticles() {
   const container   = document.getElementById('newsContainer');
@@ -658,9 +638,17 @@ function renderArticles() {
     : 'Semua waktu';
   statusRight.textContent = `${filtered.length} artikel · ${kwLabel} · ${dateLabel}`;
 
+  // ── Pagination Calculation ──
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const pageItems  = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   const grid = document.createElement('div');
   grid.className = 'news-grid';
-  filtered.forEach((article, idx) => {
+  pageItems.forEach((article, idx) => {
     const card = document.createElement('div');
     card.className = 'card';
     card.style.animationDelay = `${idx * 0.03}s`;
@@ -674,26 +662,74 @@ function renderArticles() {
       </div>`;
     grid.appendChild(card);
   });
+  
   container.innerHTML = '';
   container.appendChild(grid);
+
+  // ── Render Pagination Controls ──
+  if (totalPages > 1) {
+    const paginationWrapper = document.createElement('div');
+    paginationWrapper.style.display = 'flex';
+    paginationWrapper.style.flexDirection = 'column';
+    paginationWrapper.style.alignItems = 'center';
+    paginationWrapper.style.gap = '0.5rem';
+    paginationWrapper.style.padding = '1.5rem 0';
+    paginationWrapper.style.marginTop = '1rem';
+
+    const pagination = document.createElement('div');
+    pagination.className = 'pagination';
+    pagination.style.marginTop = '0';
+    pagination.style.padding = '0';
+
+    let pageHtml = `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">‹ Prev</button>`;
+
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+
+    if (startPage > 1) {
+      pageHtml += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
+      if (startPage > 2) pageHtml += `<span class="page-dots">...</span>`;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageHtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) pageHtml += `<span class="page-dots">...</span>`;
+      pageHtml += `<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+    }
+
+    pageHtml += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">Next ›</button>`;
+
+    pagination.innerHTML = pageHtml;
+
+    const pageInfo = document.createElement('div');
+    pageInfo.style.fontSize = '0.75rem';
+    pageInfo.style.color = 'var(--muted)';
+    pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
+
+    paginationWrapper.appendChild(pagination);
+    paginationWrapper.appendChild(pageInfo);
+    container.appendChild(paginationWrapper);
+  }
+}
+
+function goToPage(page) {
+  currentPage = page;
+  renderArticles();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// EXPORT TO CSV (Excel-compatible, UTF-8 BOM)
+// EXPORT TO CSV
 // ═══════════════════════════════════════════════════════════════════
 function exportToCSV() {
   if (!allArticles.length) return;
-
   const sorted = [...allArticles].sort((a,b) => (new Date(b.pubDate).getTime()||0) - (new Date(a.pubDate).getTime()||0));
-
   const headers = ['No', 'Tanggal', 'Sumber', 'Judul', 'Deskripsi', 'Link'];
   const rows = sorted.map((a, i) => [
-    i + 1,
-    fmt(a.pubDate),
-    a.source || '',
-    a.title || '',
-    (a.description || '').replace(/\r?\n/g, ' '),
-    a.link || '',
+    i + 1, fmt(a.pubDate), a.source || '', a.title || '', (a.description || '').replace(/\r?\n/g, ' '), a.link || '',
   ].map(v => `"${String(v).replace(/"/g, '""')}"`));
 
   const csv   = [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
@@ -701,7 +737,6 @@ function exportToCSV() {
   const url   = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-
   const kw   = (activeCats.size > 0 ? [...activeCats][0] : baseKeyword).replace(/\s+/g,'_').substring(0,20);
   const date = new Date().toISOString().split('T')[0];
   anchor.download = `PANTAU_${kw}_${date}.csv`;
@@ -713,8 +748,7 @@ function exportToCSV() {
 // SETTINGS PANEL
 // ═══════════════════════════════════════════════════════════════════
 function openSettings() {
-  renderSettingsSources();
-  renderSettingsKeywords();
+  renderSettingsSources(); renderSettingsKeywords();
   document.getElementById('settingsOverlay').classList.add('open');
 }
 function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
@@ -722,93 +756,49 @@ function handleSettingsOverlay(e) { if (e.target === document.getElementById('se
 
 function renderSettingsSources() {
   const el = document.getElementById('settingsSources');
-  if (!config.sources.length) {
-    el.innerHTML = `<div style="font-size:0.78rem;color:var(--muted);padding:0.5rem 0">Belum ada sumber.</div>`;
-    return;
-  }
+  if (!config.sources.length) { el.innerHTML = `<div style="font-size:0.78rem;color:var(--muted);padding:0.5rem 0">Belum ada sumber.</div>`; return; }
   el.innerHTML = config.sources.map((d, i) => `
-    <div class="settings-item">
-      <span class="settings-item-label">${esc(d)}</span>
-      <button class="settings-del" onclick="deleteSource(${i})" title="Hapus">✕</button>
-    </div>`).join('');
+    <div class="settings-item"><span class="settings-item-label">${esc(d)}</span><button class="settings-del" onclick="deleteSource(${i})" title="Hapus">✕</button></div>`).join('');
 }
-
 function renderSettingsKeywords() {
   const el = document.getElementById('settingsKeywords');
-  if (!config.keywords.length) {
-    el.innerHTML = `<div style="font-size:0.78rem;color:var(--muted);padding:0.5rem 0">Belum ada keyword.</div>`;
-    return;
-  }
+  if (!config.keywords.length) { el.innerHTML = `<div style="font-size:0.78rem;color:var(--muted);padding:0.5rem 0">Belum ada keyword.</div>`; return; }
   el.innerHTML = config.keywords.map((k, i) => `
-    <div class="settings-item">
-      <div>
-        <div class="settings-item-label">${esc(k.label)}</div>
-        <div class="settings-item-sub">${esc(k.keyword)}</div>
-      </div>
-      <button class="settings-del" onclick="deleteKeyword(${i})" title="Hapus">✕</button>
-    </div>`).join('');
+    <div class="settings-item"><div><div class="settings-item-label">${esc(k.label)}</div><div class="settings-item-sub">${esc(k.keyword)}</div></div>
+    <button class="settings-del" onclick="deleteKeyword(${i})" title="Hapus">✕</button></div>`).join('');
 }
 
 function addSource() {
   const input = document.getElementById('newSourceInput');
   const val   = input.value.trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\//,'');
   if (!val || config.sources.includes(val)) { input.focus(); return; }
-  config.sources.push(val);
-  activeSources.add(val);
-  saveConfig();
-  renderSettingsSources();
-  renderSourceChips();
-  input.value = '';
+  config.sources.push(val); activeSources.add(val); saveConfig(); renderSettingsSources(); renderSourceChips(); input.value = '';
 }
-
 function deleteSource(i) {
-  const domain = config.sources[i];
-  config.sources.splice(i, 1);
-  activeSources.delete(domain);
+  const domain = config.sources[i]; config.sources.splice(i, 1); activeSources.delete(domain);
   if (activeSources.size === 0 && config.sources.length > 0) activeSources.add(config.sources[0]);
-  saveConfig();
-  renderSettingsSources();
-  renderSourceChips();
+  saveConfig(); renderSettingsSources(); renderSourceChips();
 }
-
 function addKeyword() {
-  const labelEl   = document.getElementById('newKwLabel');
-  const keywordEl = document.getElementById('newKwKeyword');
-  const label     = labelEl.value.trim();
-  const keyword   = keywordEl.value.trim();
+  const labelEl = document.getElementById('newKwLabel'), keywordEl = document.getElementById('newKwKeyword');
+  const label = labelEl.value.trim(), keyword = keywordEl.value.trim();
   if (!label || !keyword) { (label ? keywordEl : labelEl).focus(); return; }
   if (config.keywords.some(k => k.keyword === keyword)) { keywordEl.focus(); return; }
-  config.keywords.push({ label, keyword });
-  saveConfig();
-  renderSettingsKeywords();
-  renderCatChips();
-  labelEl.value = '';
-  keywordEl.value = '';
+  config.keywords.push({ label, keyword }); saveConfig(); renderSettingsKeywords(); renderCatChips(); labelEl.value = ''; keywordEl.value = '';
 }
-
 function deleteKeyword(i) {
-  const kw = config.keywords[i].keyword;
-  config.keywords.splice(i, 1);
-  activeCats.delete(kw);
-  saveConfig();
-  renderSettingsKeywords();
-  renderCatChips();
+  const kw = config.keywords[i].keyword; config.keywords.splice(i, 1); activeCats.delete(kw);
+  saveConfig(); renderSettingsKeywords(); renderCatChips();
 }
-
 function resetToDefaults() {
   if (!confirm('Reset ke konfigurasi default? Sumber dan keyword kustom akan hilang.')) return;
   config = { sources: [...DEFAULT_SOURCES], keywords: DEFAULT_KEYWORDS.map(x => ({ ...x })) };
-  saveConfig();
-  activeSources = new Set(config.sources);
-  activeCats.clear();
-  renderSettingsSources();
-  renderSettingsKeywords();
-  renderSourceChips();
-  renderCatChips();
+  saveConfig(); activeSources = new Set(config.sources); activeCats.clear();
+  renderSettingsSources(); renderSettingsKeywords(); renderSourceChips(); renderCatChips();
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// CALENDAR
+// CALENDAR (DI PERBAIKI)
 // ═══════════════════════════════════════════════════════════════════
 const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 const DAYS_ID   = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
@@ -876,7 +866,8 @@ function renderCal() {
       }
     }
     const ds = `${calYear},${calMonth},${d}`;
-    html += `<button class="${cls}" onclick="calClick(${ds})" onmouseenter="calHover(${ds})">${d}</button>`;
+    // FIXED: Menggunakan onmousedown untuk menghindari klik yang terlewat (hilang fokus) saat re-render
+    html += `<button class="${cls}" onmousedown="calClick(${ds})" onmouseenter="calHover(${ds})">${d}</button>`;
   }
   grid.innerHTML = html;
   updateCalFooter();
