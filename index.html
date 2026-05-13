@@ -25,228 +25,95 @@
       --font-sans: 'Source Sans 3', system-ui, sans-serif;
     }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-sans);
-      font-weight: 300;
-      min-height: 100vh;
-    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-weight: 300; min-height: 100vh; }
 
-    /* ── HEADER ─────────────────────────────────────────────────────── */
-    header {
-      border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
-      position: sticky; top: 0;
-      background: rgba(13,13,13,0.96);
-      backdrop-filter: blur(12px);
-      z-index: 200;
-    }
-    .header-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; align-items: center;
-      justify-content: space-between;
-      gap: 1.5rem; padding: 1rem 0;
-    }
+    /* ── HEADER ── */
+    header { border-bottom: 1px solid var(--border); padding: 0 2rem; position: sticky; top: 0; background: rgba(13,13,13,0.96); backdrop-filter: blur(12px); z-index: 200; }
+    .header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1rem 0; }
     .brand { display: flex; align-items: baseline; gap: 0.6rem; flex-shrink: 0; }
     .brand-name { font-family: var(--font-serif); font-size: 1.7rem; font-weight: 900; letter-spacing: 0.12em; }
     .brand-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; margin-bottom: 3px; }
     .brand-sub { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
 
-    /* FIX 1: Nav links */
     .nav-links { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; }
     .nav-link {
-      color: var(--muted); text-decoration: none;
+      color: var(--muted); text-decoration: none; background: none; border: 1px solid transparent;
       font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 0.35rem 0.75rem; border: 1px solid transparent;
-      transition: all 0.15s; white-space: nowrap;
+      padding: 0.35rem 0.75rem; transition: all 0.15s; white-space: nowrap; cursor: pointer; font-family: var(--font-sans);
     }
     .nav-link:hover { color: var(--text); border-color: var(--border); }
     .nav-link.active { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
 
     .search-form { display: flex; gap: 0.5rem; flex: 1; max-width: 520px; }
-    .search-input {
-      flex: 1; background: var(--surface2);
-      border: 1px solid var(--border); color: var(--text);
-      padding: 0.55rem 1rem; font-family: var(--font-sans);
-      font-size: 0.9rem; font-weight: 300; outline: none;
-      transition: border-color 0.2s;
-    }
+    .search-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 0.55rem 1rem; font-family: var(--font-sans); font-size: 0.9rem; font-weight: 300; outline: none; transition: border-color 0.2s; }
     .search-input:focus { border-color: var(--accent); }
     .search-input::placeholder { color: var(--muted); }
-    .btn {
-      background: var(--accent); color: #fff; border: none;
-      padding: 0.55rem 1.2rem; font-family: var(--font-sans);
-      font-size: 0.85rem; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; cursor: pointer; transition: background 0.2s; white-space: nowrap;
-    }
+    .btn { background: var(--accent); color: #fff; border: none; padding: 0.55rem 1.2rem; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
     .btn:hover { background: #a51d24; }
 
-    /* ── FILTER BAR — FIX 3: Sticky ────────────────────────────────── */
-    .filter-bar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      /* top set by JS after measuring header height */
-      z-index: 150;
-    }
-    .filter-row {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; gap: 0.45rem; align-items: center;
-      padding: 0.5rem 2rem; overflow-x: auto;
-    }
+    /* ── FILTER BAR ── */
+    .filter-bar { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; z-index: 150; }
+    .filter-row { max-width: 1100px; margin: 0 auto; display: flex; gap: 0.45rem; align-items: center; padding: 0.5rem 2rem; overflow-x: auto; flex-wrap: wrap; }
     .filter-row + .filter-row { border-top: 1px solid var(--border); }
-    .filter-label {
-      font-size: 0.67rem; letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--muted); margin-right: 0.3rem; white-space: nowrap; flex-shrink: 0;
-    }
+    .filter-label { font-size: 0.67rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; white-space: nowrap; flex-shrink: 0; }
 
-    /* Chip base */
-    .chip {
-      background: transparent; border: 1px solid var(--border); color: var(--muted);
-      padding: 0.28rem 0.85rem; font-size: 0.77rem; font-family: var(--font-sans);
-      cursor: pointer; transition: all 0.15s; white-space: nowrap; line-height: 1.4;
-    }
-
-    /* Source — green */
+    .chip { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 0.28rem 0.85rem; font-size: 0.77rem; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; white-space: nowrap; line-height: 1.4; }
     .source-chip { display: flex; align-items: center; gap: 0.4rem; }
     .source-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.15s; flex-shrink: 0; }
     .source-chip.active { border-color: var(--green); color: var(--text); }
     .source-chip.active .dot { background: var(--green); }
     .source-chip:hover { border-color: #22c55e55; color: var(--text); }
-
-    /* Category — red, multi-select */
     .cat-chip:hover { border-color: #c9252d55; color: var(--text); }
     .cat-chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--text); }
 
-    /* Date button — gold */
-    .date-trigger {
-      display: flex; align-items: center; gap: 0.5rem;
-      background: transparent; border: 1px solid var(--border); color: var(--muted);
-      padding: 0.28rem 0.85rem; font-size: 0.77rem; font-family: var(--font-sans);
-      cursor: pointer; transition: all 0.15s; white-space: nowrap; line-height: 1.4;
-    }
+    .date-trigger { display: flex; align-items: center; gap: 0.5rem; background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 0.28rem 0.85rem; font-size: 0.77rem; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; white-space: nowrap; line-height: 1.4; }
     .date-trigger:hover { border-color: #c8a96e55; color: var(--text); }
     .date-trigger.has-date { background: var(--gold-dim); border-color: var(--gold); color: var(--text); }
     .date-trigger-icon { font-size: 0.8rem; }
-    .date-clear {
-      background: none; border: none; color: var(--muted);
-      cursor: pointer; font-size: 0.85rem; padding: 0 0 0 0.1rem;
-      line-height: 1; transition: color 0.15s;
-    }
+    .date-clear { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 0 0 0 0.1rem; line-height: 1; transition: color 0.15s; }
     .date-clear:hover { color: var(--accent); }
 
-    /* ── CALENDAR POPOVER ────────────────────────────────────────────── */
-    .cal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 300;
-    }
+    /* ── CALENDAR POPOVER ── */
+    .cal-overlay { display: none; position: fixed; inset: 0; z-index: 300; }
     .cal-overlay.open { display: block; }
-    .cal-popover {
-      position: absolute;
-      background: #1a1a1a; border: 1px solid var(--border);
-      padding: 1rem; min-width: 280px;
-      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
-    }
-    .cal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 0.75rem;
-    }
-    .cal-nav {
-      background: none; border: none; color: var(--muted);
-      cursor: pointer; font-size: 1rem; padding: 0.2rem 0.5rem;
-      transition: color 0.15s;
-    }
+    .cal-popover { position: absolute; background: #1a1a1a; border: 1px solid var(--border); padding: 1rem; min-width: 280px; box-shadow: 0 16px 48px rgba(0,0,0,0.6); }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .cal-nav { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 0.2rem 0.5rem; transition: color 0.15s; }
     .cal-nav:hover:not(:disabled) { color: var(--text); }
     .cal-nav:disabled { opacity: 0.2; cursor: default; }
-    .cal-month-label {
-      font-size: 0.85rem; font-weight: 600; color: var(--text); letter-spacing: 0.05em;
-    }
-    .cal-mode-hint {
-      font-size: 0.68rem; color: var(--muted); text-align: center;
-      margin-bottom: 0.6rem; letter-spacing: 0.03em;
-    }
-    .cal-grid {
-      display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
-    }
-    .cal-day-name {
-      font-size: 0.65rem; color: var(--muted); text-align: center;
-      padding: 0.2rem 0; letter-spacing: 0.05em; text-transform: uppercase;
-    }
-    .cal-day {
-      font-size: 0.78rem; text-align: center; padding: 0.35rem 0;
-      cursor: pointer; border-radius: 2px; transition: all 0.1s; color: var(--muted);
-      background: transparent; border: none; font-family: var(--font-sans);
-    }
+    .cal-month-label { font-size: 0.85rem; font-weight: 600; color: var(--text); letter-spacing: 0.05em; }
+    .cal-mode-hint { font-size: 0.68rem; color: var(--muted); text-align: center; margin-bottom: 0.6rem; letter-spacing: 0.03em; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .cal-day-name { font-size: 0.65rem; color: var(--muted); text-align: center; padding: 0.2rem 0; letter-spacing: 0.05em; text-transform: uppercase; }
+    .cal-day { font-size: 0.78rem; text-align: center; padding: 0.35rem 0; cursor: pointer; border-radius: 2px; transition: all 0.1s; color: var(--muted); background: transparent; border: none; font-family: var(--font-sans); }
     .cal-day:hover:not(.empty):not(.disabled) { background: var(--surface2); color: var(--text); }
     .cal-day.empty { cursor: default; }
-    /* FIX 2: Hide future days cleanly instead of 0.25 opacity invisible */
     .cal-day.disabled { opacity: 0; cursor: default; pointer-events: none; }
     .cal-day.today { color: var(--gold); }
     .cal-day.in-range { background: rgba(200,169,110,0.15); color: var(--text); border-radius: 0; }
-    .cal-day.range-start, .cal-day.range-end {
-      background: var(--gold); color: #111; font-weight: 600; border-radius: 2px;
-    }
+    .cal-day.range-start, .cal-day.range-end { background: var(--gold); color: #111; font-weight: 600; border-radius: 2px; }
     .cal-day.single-sel { background: var(--gold); color: #111; font-weight: 600; }
-    .cal-footer {
-      margin-top: 0.75rem; padding-top: 0.75rem;
-      border-top: 1px solid var(--border);
-      display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;
-    }
-    .cal-footer-info {
-      flex: 1; font-size: 0.72rem; color: var(--muted);
-    }
-    .cal-btn {
-      background: none; border: 1px solid var(--border); color: var(--muted);
-      padding: 0.3rem 0.7rem; font-size: 0.75rem; font-family: var(--font-sans);
-      cursor: pointer; transition: all 0.15s;
-    }
+    .cal-footer { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center; }
+    .cal-footer-info { flex: 1; font-size: 0.72rem; color: var(--muted); }
+    .cal-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 0.3rem 0.7rem; font-size: 0.75rem; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; }
     .cal-btn:hover { border-color: var(--gold); color: var(--text); }
     .cal-btn.primary { background: var(--gold); border-color: var(--gold); color: #111; font-weight: 600; }
     .cal-btn.primary:hover { background: #b8994e; }
 
-    /* ── MAIN ────────────────────────────────────────────────────────── */
+    /* ── MAIN ── */
     main { max-width: 1100px; margin: 2rem auto; padding: 0 2rem; }
-
-    /* FIX 3: Status bar sticky */
-    .status-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1.5rem; font-size: 0.78rem; color: var(--muted);
-      border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; gap: 1rem;
-      position: sticky;
-      /* top set by JS */
-      z-index: 90;
-      background: var(--bg);
-      padding-top: 0.75rem;
-      margin-top: -0.75rem;
-    }
-    .live-dot {
-      display: inline-block; width: 6px; height: 6px;
-      background: var(--green); border-radius: 50%; margin-right: 6px;
-      animation: pulse 2s infinite;
-    }
+    .status-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; font-size: 0.78rem; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; gap: 0.5rem; position: sticky; z-index: 90; background: var(--bg); padding-top: 0.75rem; margin-top: -0.75rem; flex-wrap: wrap; }
+    .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; margin-right: 6px; animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
     .loading { text-align: center; padding: 4rem 2rem; color: var(--muted); }
-    .loading-spinner {
-      width: 32px; height: 32px; border: 2px solid var(--border);
-      border-top-color: var(--accent); border-radius: 50%;
-      animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
-    }
+    .loading-spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .error-box { border: 1px solid var(--accent); background: var(--accent-dim); padding: 1rem 1.5rem; font-size: 0.9rem; }
 
     /* NEWS GRID */
-    .news-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1px; background: var(--border);
-    }
-    .card {
-      background: var(--bg); padding: 1.5rem;
-      display: flex; flex-direction: column; gap: 0.75rem;
-      transition: background 0.2s; animation: fadeUp 0.35s ease both;
-    }
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1px; background: var(--border); }
+    .card { background: var(--bg); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; transition: background 0.2s; animation: fadeUp 0.35s ease both; }
     .card:hover { background: var(--surface); }
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
     .card-source { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
@@ -263,18 +130,72 @@
 
     footer { text-align: center; padding: 2rem; font-size: 0.75rem; color: var(--muted); border-top: 1px solid var(--border); margin-top: 3rem; letter-spacing: 0.05em; }
 
-    .action-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--muted);
-      padding: 0.25rem 0.7rem; font-size: 0.73rem; font-family: var(--font-sans);
-      cursor: pointer; transition: all 0.15s; white-space: nowrap; display: inline-flex;
-      align-items: center; gap: 0.35rem; letter-spacing: 0.03em;
-    }
+    .action-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 0.25rem 0.7rem; font-size: 0.73rem; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.35rem; letter-spacing: 0.03em; }
     .action-btn:hover { border-color: var(--text); color: var(--text); }
     .action-btn.reset:hover { border-color: var(--accent); color: var(--accent); }
     .action-btn.refresh:hover { border-color: var(--green); color: var(--green); }
+    .action-btn.export:hover { border-color: var(--gold); color: var(--gold); }
+    .action-btn.export:disabled { opacity: 0.3; cursor: default; }
     .action-btn svg { width: 11px; height: 11px; flex-shrink: 0; }
     #refreshIcon { transition: transform 0.5s; }
     .spinning #refreshIcon { animation: spin 0.7s linear infinite; }
+
+    /* ── SETTINGS PANEL ── */
+    .settings-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 400; }
+    .settings-overlay.open { display: block; }
+    .settings-panel {
+      position: absolute; right: 0; top: 0; height: 100%; width: 380px; max-width: 95vw;
+      background: var(--surface); border-left: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow: hidden;
+      animation: slideIn 0.22s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .settings-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .settings-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em; }
+    .settings-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 0.2rem 0.4rem; transition: color 0.15s; }
+    .settings-close:hover { color: var(--text); }
+    .settings-body { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1.75rem; }
+    .settings-section-title { font-size: 0.67rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    .settings-items { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.75rem; }
+    .settings-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 0.45rem 0.75rem; font-size: 0.82rem; color: var(--text);
+    }
+    .settings-item-label { font-size: 0.82rem; color: var(--text); }
+    .settings-item-sub { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+    .settings-del {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 0.85rem; padding: 0 0.2rem; transition: color 0.15s; flex-shrink: 0; line-height: 1;
+    }
+    .settings-del:hover { color: var(--accent); }
+    .settings-add { display: flex; flex-direction: column; gap: 0.35rem; }
+    .settings-input {
+      background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+      padding: 0.45rem 0.75rem; font-family: var(--font-sans); font-size: 0.82rem;
+      outline: none; transition: border-color 0.2s; width: 100%;
+    }
+    .settings-input:focus { border-color: var(--gold); }
+    .settings-input::placeholder { color: var(--muted); font-size: 0.78rem; }
+    .settings-add-btn {
+      background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+      padding: 0.45rem 1rem; font-family: var(--font-sans); font-size: 0.78rem;
+      cursor: pointer; transition: all 0.15s; text-align: center; letter-spacing: 0.05em;
+    }
+    .settings-add-btn:hover { border-color: var(--green); color: var(--green); }
+    .settings-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .settings-reset-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      padding: 0.45rem 1rem; font-family: var(--font-sans); font-size: 0.75rem;
+      cursor: pointer; transition: all 0.15s; width: 100%; letter-spacing: 0.05em;
+    }
+    .settings-reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Progress batch info */
+    .batch-info { font-size: 0.72rem; color: var(--gold); margin-top: 0.5rem; }
 
     @media (max-width: 640px) {
       .header-inner { flex-wrap: wrap; }
@@ -282,6 +203,7 @@
       .nav-links { order: 2; }
       main { padding: 0 1rem; }
       .filter-row { padding: 0.5rem 1rem; }
+      .settings-panel { width: 100%; }
     }
   </style>
 </head>
@@ -294,13 +216,11 @@
       <div class="brand-dot"></div>
       <span class="brand-sub">Pemerintahan RI</span>
     </div>
-
-    <!-- FIX 1: Nav links — active state set by JS -->
     <div class="nav-links">
       <a class="nav-link" id="navBerita" href="/">Berita</a>
       <a class="nav-link" id="navFormatter" href="/formatter.html">Formatter</a>
+      <button class="nav-link" onclick="openSettings()">⚙ Pengaturan</button>
     </div>
-
     <div class="search-form">
       <input id="searchInput" class="search-input" type="text"
         placeholder="Cari topik, kementerian, kebijakan..."
@@ -311,31 +231,16 @@
 </header>
 
 <div class="filter-bar" id="filterBar">
-  <!-- ROW 1: Sumber -->
+  <!-- ROW 1: Sumber (dynamic) -->
   <div class="filter-row">
     <span class="filter-label">Sumber:</span>
-    <button class="chip source-chip active" data-source="detik.com"    onclick="toggleSource(this)"><span class="dot"></span>detik.com</button>
-    <button class="chip source-chip active" data-source="kompas.com"   onclick="toggleSource(this)"><span class="dot"></span>kompas.com</button>
-    <button class="chip source-chip active" data-source="kumparan.com" onclick="toggleSource(this)"><span class="dot"></span>kumparan.com</button>
-    <button class="chip source-chip active" data-source="liputan6.com" onclick="toggleSource(this)"><span class="dot"></span>liputan6.com</button>
-    <button class="chip source-chip active" data-source="tempo.co"     onclick="toggleSource(this)"><span class="dot"></span>tempo.co</button>
+    <div id="sourceChipsContainer" style="display:flex;gap:0.45rem;flex-wrap:wrap;align-items:center"></div>
   </div>
-
-  <!-- ROW 2: Kategori (multi-select) -->
+  <!-- ROW 2: Kategori (dynamic) -->
   <div class="filter-row">
     <span class="filter-label">Kategori:</span>
-    <button class="chip cat-chip" data-keyword="Prabowo" onclick="toggleCat(this)">Prabowo</button>
-    <button class="chip cat-chip" data-keyword="MBG" onclick="toggleCat(this)">MBG</button>
-    <button class="chip cat-chip" data-keyword="CKG" onclick="toggleCat(this)">CKG</button>
-    <button class="chip cat-chip" data-keyword="kampung haji" onclick="toggleCat(this)">Kampung Haji</button>
-    <button class="chip cat-chip" data-keyword="PPRT" onclick="toggleCat(this)">PPRT</button>
-    <button class="chip cat-chip" data-keyword="lapangan kerja" onclick="toggleCat(this)">Lapangan Kerja</button>
-    <button class="chip cat-chip" data-keyword="kebijakan pemerintah Indonesia" onclick="toggleCat(this)">Kebijakan Pemerintah</button>
-    <button class="chip cat-chip" data-keyword="nadiem" onclick="toggleCat(this)">Nadiem</button>
-    <button class="chip cat-chip" data-keyword="kasus chromebook" onclick="toggleCat(this)">Kasus Chromebook</button>
-    <button class="chip cat-chip" data-keyword="kasus hukum indonesia" onclick="toggleCat(this)">Kasus Hukum Indonesia</button>
+    <div id="catChipsContainer" style="display:flex;gap:0.45rem;flex-wrap:wrap;align-items:center"></div>
   </div>
-
   <!-- ROW 3: Tanggal -->
   <div class="filter-row">
     <span class="filter-label">Tanggal:</span>
@@ -344,6 +249,7 @@
       <span id="dateLabel">Pilih tanggal</span>
     </button>
     <button class="date-clear" id="dateClear" style="display:none" onclick="clearDate()" title="Hapus filter tanggal">✕</button>
+    <span id="batchProgress" class="batch-info" style="display:none"></span>
   </div>
 </div>
 
@@ -355,7 +261,7 @@
       <span class="cal-month-label" id="calMonthLabel"></span>
       <button class="cal-nav" id="calNext" onclick="calNav(1)">›</button>
     </div>
-    <div class="cal-mode-hint" id="calModeHint">Klik satu tanggal atau drag untuk rentang</div>
+    <div class="cal-mode-hint" id="calModeHint">Klik satu tanggal atau rentang</div>
     <div class="cal-grid" id="calGrid"></div>
     <div class="cal-footer">
       <span class="cal-footer-info" id="calFooterInfo"></span>
@@ -365,16 +271,64 @@
   </div>
 </div>
 
+<!-- Settings Panel -->
+<div class="settings-overlay" id="settingsOverlay" onclick="handleSettingsOverlay(event)">
+  <div class="settings-panel" onclick="event.stopPropagation()">
+    <div class="settings-head">
+      <span class="settings-title">Pengaturan</span>
+      <button class="settings-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <!-- SUMBER BERITA -->
+      <div>
+        <div class="settings-section-title">Sumber Berita</div>
+        <div class="settings-items" id="settingsSources"></div>
+        <div class="settings-add">
+          <input class="settings-input" id="newSourceInput" placeholder="Domain, contoh: cnnindonesia.com" />
+          <button class="settings-add-btn" onclick="addSource()">+ Tambah Sumber</button>
+        </div>
+      </div>
+
+      <!-- KATEGORI / KEYWORD -->
+      <div>
+        <div class="settings-section-title">Kategori / Keyword</div>
+        <div class="settings-items" id="settingsKeywords"></div>
+        <div class="settings-add">
+          <input class="settings-input" id="newKwLabel" placeholder="Label (tampil di filter), misal: PDIP" />
+          <input class="settings-input" id="newKwKeyword" placeholder="Keyword pencarian, misal: PDIP partai" style="margin-top:0" />
+          <button class="settings-add-btn" onclick="addKeyword()">+ Tambah Keyword</button>
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div style="font-size:0.75rem;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);padding-top:1rem">
+        Perubahan disimpan otomatis di browser. Untuk berbagi konfigurasi ke perangkat lain, gunakan tombol Reset dan entry ulang manual.
+      </div>
+
+    </div>
+    <div class="settings-footer">
+      <button class="settings-reset-btn" onclick="resetToDefaults()">↺ Reset ke Konfigurasi Default</button>
+    </div>
+  </div>
+</div>
+
 <main>
   <div class="status-bar" id="statusBar">
     <span><span class="live-dot"></span>Google News RSS · Real-time</span>
-    <span id="statusRight">Memuat berita...</span>
-    <span style="display:flex;gap:0.4rem;flex-shrink:0">
+    <span id="statusRight" style="flex:1">Memuat berita...</span>
+    <span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap">
+      <button class="action-btn export" id="exportBtn" onclick="exportToCSV()" disabled title="Export ke CSV (buka di Excel)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 2v8M5 7l3 3 3-3"/><rect x="2" y="11" width="12" height="3" rx="1"/>
+        </svg>
+        Export CSV
+      </button>
       <button class="action-btn reset" onclick="resetAll()" title="Reset semua filter">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M2 8a6 6 0 1 0 1.2-3.6"/><path d="M2 3.5V8h4.5"/>
         </svg>
-        Reset Filter
+        Reset
       </button>
       <button class="action-btn refresh" id="refreshBtn" onclick="refreshNews()" title="Refresh berita">
         <svg id="refreshIcon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -389,41 +343,73 @@
   </div>
 </main>
 
-<footer>PANTAU · Netlify Functions · Sumber: Google News</footer>
+<footer>PANTAU · Netlify Functions · Sumber: Google News RSS</footer>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-// FIX 1: Active nav detection
+// ACTIVE NAV
 // ═══════════════════════════════════════════════════════════════════
 (function() {
   const path = window.location.pathname;
-  const isFormatter = path.includes('formatter');
-  document.getElementById('navBerita').classList.toggle('active', !isFormatter);
-  document.getElementById('navFormatter').classList.toggle('active', isFormatter);
+  document.getElementById('navBerita').classList.toggle('active', !path.includes('formatter'));
+  document.getElementById('navFormatter').classList.toggle('active', path.includes('formatter'));
 })();
 
 // ═══════════════════════════════════════════════════════════════════
-// FIX 3: Sticky positions — calculated after fonts/layout settle
+// STICKY POSITIONS
 // ═══════════════════════════════════════════════════════════════════
 function updateStickyPositions() {
   const headerH = document.querySelector('header').offsetHeight;
   const filterBar = document.getElementById('filterBar');
   filterBar.style.top = headerH + 'px';
   const filterH = filterBar.offsetHeight;
-  const statusBar = document.getElementById('statusBar');
-  statusBar.style.top = (headerH + filterH) + 'px';
+  document.getElementById('statusBar').style.top = (headerH + filterH) + 'px';
 }
 window.addEventListener('load', updateStickyPositions);
 window.addEventListener('resize', updateStickyPositions);
-// Run immediately too in case fonts are cached
 updateStickyPositions();
+
+// ═══════════════════════════════════════════════════════════════════
+// CONFIG — localStorage persistence
+// ═══════════════════════════════════════════════════════════════════
+const DEFAULT_SOURCES = ['detik.com','kompas.com','kumparan.com','liputan6.com','tempo.co'];
+const DEFAULT_KEYWORDS = [
+  { label: 'Prabowo',              keyword: 'Prabowo' },
+  { label: 'MBG',                  keyword: 'MBG' },
+  { label: 'CKG',                  keyword: 'CKG' },
+  { label: 'Kampung Haji',         keyword: 'kampung haji' },
+  { label: 'PPRT',                 keyword: 'PPRT' },
+  { label: 'Lapangan Kerja',       keyword: 'lapangan kerja' },
+  { label: 'Kebijakan Pemerintah', keyword: 'kebijakan pemerintah Indonesia' },
+  { label: 'Nadiem',               keyword: 'nadiem' },
+  { label: 'Kasus Chromebook',     keyword: 'kasus chromebook' },
+  { label: 'Kasus Hukum',          keyword: 'kasus hukum indonesia' },
+];
+
+function loadConfig() {
+  try {
+    const s = localStorage.getItem('pantau_sources');
+    const k = localStorage.getItem('pantau_keywords');
+    return {
+      sources:  s ? JSON.parse(s) : [...DEFAULT_SOURCES],
+      keywords: k ? JSON.parse(k) : DEFAULT_KEYWORDS.map(x => ({ ...x })),
+    };
+  } catch { return { sources: [...DEFAULT_SOURCES], keywords: DEFAULT_KEYWORDS.map(x => ({ ...x })) }; }
+}
+
+function saveConfig() {
+  localStorage.setItem('pantau_sources',  JSON.stringify(config.sources));
+  localStorage.setItem('pantau_keywords', JSON.stringify(config.keywords));
+}
+
+let config = loadConfig();
 
 // ═══════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════
 let baseKeyword   = 'pemerintah Indonesia';
 let activeCats    = new Set();
-let activeSources = new Set(['detik.com','kompas.com','kumparan.com','liputan6.com','tempo.co']);
+let activeSources = new Set(config.sources);
 let allArticles   = [];
 let dateFrom = null;
 let dateTo   = null;
@@ -432,26 +418,56 @@ let dateTo   = null;
 // HELPERS
 // ═══════════════════════════════════════════════════════════════════
 function esc(str) {
-  return String(str || '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function fmt(dateStr) {
   if (!dateStr) return '';
   try {
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      day:'numeric', month:'short', year:'numeric',
-      hour:'2-digit', minute:'2-digit'
-    });
+    return new Date(dateStr).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
   } catch { return dateStr; }
 }
 function fmtShort(d) {
   if (!d) return '';
   return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
 }
+function toYMD(d) {
+  if (!d) return '';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
 
 // ═══════════════════════════════════════════════════════════════════
-// SOURCE TOGGLE
+// RENDER CHIPS (dynamic from config)
+// ═══════════════════════════════════════════════════════════════════
+function renderSourceChips() {
+  const container = document.getElementById('sourceChipsContainer');
+  container.innerHTML = '';
+  config.sources.forEach(domain => {
+    const btn = document.createElement('button');
+    btn.className = 'chip source-chip' + (activeSources.has(domain) ? ' active' : '');
+    btn.dataset.source = domain;
+    btn.innerHTML = `<span class="dot"></span>${esc(domain)}`;
+    btn.onclick = () => toggleSource(btn);
+    container.appendChild(btn);
+  });
+  updateStickyPositions();
+}
+
+function renderCatChips() {
+  const container = document.getElementById('catChipsContainer');
+  container.innerHTML = '';
+  config.keywords.forEach(({ label, keyword }) => {
+    const btn = document.createElement('button');
+    btn.className = 'chip cat-chip' + (activeCats.has(keyword) ? ' active' : '');
+    btn.dataset.keyword = keyword;
+    btn.textContent = label;
+    btn.onclick = () => toggleCat(btn);
+    container.appendChild(btn);
+  });
+  updateStickyPositions();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SOURCE / CATEGORY TOGGLE
 // ═══════════════════════════════════════════════════════════════════
 function toggleSource(btn) {
   const src = btn.dataset.source;
@@ -466,9 +482,6 @@ function toggleSource(btn) {
   loadNews();
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// CATEGORY TOGGLE
-// ═══════════════════════════════════════════════════════════════════
 function toggleCat(btn) {
   const kw = btn.dataset.keyword;
   if (activeCats.has(kw)) {
@@ -487,7 +500,7 @@ function buildKeyword() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// SEARCH
+// SEARCH / RESET / REFRESH
 // ═══════════════════════════════════════════════════════════════════
 function doSearch() {
   const val = document.getElementById('searchInput').value.trim();
@@ -497,18 +510,13 @@ function doSearch() {
   document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
   loadNews();
 }
-document.getElementById('searchInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doSearch();
-});
+document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
-// ═══════════════════════════════════════════════════════════════════
-// RESET & REFRESH
-// ═══════════════════════════════════════════════════════════════════
 function resetAll() {
-  activeSources = new Set(['detik.com','kompas.com','kumparan.com','liputan6.com','tempo.co']);
-  document.querySelectorAll('.source-chip').forEach(b => b.classList.add('active'));
+  activeSources = new Set(config.sources);
+  renderSourceChips();
   activeCats.clear();
-  document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+  renderCatChips();
   clearDate();
   baseKeyword = 'pemerintah Indonesia';
   document.getElementById('searchInput').value = baseKeyword;
@@ -519,41 +527,104 @@ function refreshNews() {
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
   btn.disabled = true;
-  loadNews().finally(() => {
-    btn.classList.remove('spinning');
-    btn.disabled = false;
-  });
+  loadNews().finally(() => { btn.classList.remove('spinning'); btn.disabled = false; });
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// FETCH
+// MULTI-WINDOW DATE RANGE SPLIT (for >100 articles)
+// ═══════════════════════════════════════════════════════════════════
+function buildDateWindows(from, to, windowDays) {
+  const windows = [];
+  let cur = new Date(from);
+  cur.setHours(0,0,0,0);
+  const end = new Date(to);
+  end.setHours(23,59,59,999);
+
+  while (cur <= end) {
+    const winEnd = new Date(cur);
+    winEnd.setDate(winEnd.getDate() + windowDays - 1);
+    winEnd.setHours(23,59,59,999);
+    if (winEnd > end) winEnd.setTime(end.getTime());
+    windows.push({ from: new Date(cur), to: new Date(winEnd) });
+    cur.setDate(cur.getDate() + windowDays);
+  }
+  return windows;
+}
+
+async function fetchBatch(keyword, sources, winFrom, winTo) {
+  // winTo passed as the day-after (exclusive) to backend
+  const beforeDate = new Date(winTo.getTime() + 86400000);
+  let url = `/.netlify/functions/fetch-news?keyword=${encodeURIComponent(keyword)}&sources=${encodeURIComponent(sources)}`;
+  url += `&dateFrom=${toYMD(winFrom)}&dateTo=${toYMD(beforeDate)}`;
+  try {
+    const res  = await fetch(url);
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch { return []; }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FETCH ORCHESTRATOR
 // ═══════════════════════════════════════════════════════════════════
 async function loadNews() {
   const keyword     = buildKeyword();
   const sources     = [...activeSources].join(',');
   const container   = document.getElementById('newsContainer');
   const statusRight = document.getElementById('statusRight');
+  const exportBtn   = document.getElementById('exportBtn');
+  const batchEl     = document.getElementById('batchProgress');
 
   container.innerHTML = `<div class="loading"><div class="loading-spinner"></div>Mengambil berita...</div>`;
   statusRight.textContent = 'Memuat...';
+  exportBtn.disabled = true;
+  batchEl.style.display = 'none';
 
   try {
-    function toYMD(d) {
-      if (!d) return '';
-      return d.getFullYear() + '-' +
-        String(d.getMonth()+1).padStart(2,'0') + '-' +
-        String(d.getDate()).padStart(2,'0');
-    }
-    const beforeDate = dateTo ? new Date(dateTo.getTime() + 86400000) : null;
-    let fetchUrl = `/.netlify/functions/fetch-news` +
-      `?keyword=${encodeURIComponent(keyword)}` +
-      `&sources=${encodeURIComponent(sources)}`;
-    if (dateFrom) fetchUrl += `&dateFrom=${toYMD(dateFrom)}`;
-    if (beforeDate) fetchUrl += `&dateTo=${toYMD(beforeDate)}`;
+    if (dateFrom && dateTo) {
+      // ── Multi-window fetch ───────────────────────────────────────
+      const rangeDays = Math.ceil((dateTo.getTime() - dateFrom.getTime()) / 86400000) + 1;
 
-    const res = await fetch(fetchUrl);
-    allArticles = await res.json();
-    if (!Array.isArray(allArticles)) allArticles = [];
+      if (rangeDays > 7) {
+        // Split into 7-day batches for volume > 100
+        const windows = buildDateWindows(dateFrom, dateTo, 7);
+        batchEl.style.display = 'inline';
+
+        const seen = new Set();
+        const accumulated = [];
+
+        for (let i = 0; i < windows.length; i++) {
+          batchEl.textContent = `Mengambil batch ${i+1}/${windows.length}...`;
+          statusRight.textContent = `Batch ${i+1}/${windows.length} · ${accumulated.length} artikel terkumpul`;
+
+          const data = await fetchBatch(keyword, sources, windows[i].from, windows[i].to);
+          for (const item of data) {
+            if (!seen.has(item.link)) {
+              seen.add(item.link);
+              accumulated.push(item);
+            }
+          }
+        }
+
+        batchEl.style.display = 'none';
+        allArticles = accumulated;
+      } else {
+        // Single fetch with date params
+        const beforeDate = new Date(dateTo.getTime() + 86400000);
+        let url = `/.netlify/functions/fetch-news?keyword=${encodeURIComponent(keyword)}&sources=${encodeURIComponent(sources)}`;
+        url += `&dateFrom=${toYMD(dateFrom)}&dateTo=${toYMD(beforeDate)}`;
+        const res = await fetch(url);
+        allArticles = await res.json();
+        if (!Array.isArray(allArticles)) allArticles = [];
+      }
+    } else {
+      // ── No date filter: single fetch ─────────────────────────────
+      const url = `/.netlify/functions/fetch-news?keyword=${encodeURIComponent(keyword)}&sources=${encodeURIComponent(sources)}`;
+      const res = await fetch(url);
+      allArticles = await res.json();
+      if (!Array.isArray(allArticles)) allArticles = [];
+    }
+
+    exportBtn.disabled = allArticles.length === 0;
     renderArticles();
   } catch (err) {
     container.innerHTML = `
@@ -566,34 +637,24 @@ async function loadNews() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// RENDER
+// RENDER ARTICLES
 // ═══════════════════════════════════════════════════════════════════
 function renderArticles() {
   const container   = document.getElementById('newsContainer');
   const statusRight = document.getElementById('statusRight');
 
   let filtered = [...allArticles];
-  filtered.sort((a, b) => {
-    const ta = new Date(a.pubDate).getTime() || 0;
-    const tb = new Date(b.pubDate).getTime() || 0;
-    return tb - ta;
-  });
+  filtered.sort((a, b) => (new Date(b.pubDate).getTime() || 0) - (new Date(a.pubDate).getTime() || 0));
 
   if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">📭</div>
-        Tidak ada berita ditemukan${dateFrom ? ' pada tanggal ini' : ''}.
-      </div>`;
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📭</div>Tidak ada berita ditemukan${dateFrom ? ' pada rentang tanggal ini' : ''}.</div>`;
     statusRight.textContent = '0 artikel';
     return;
   }
 
   const kwLabel   = activeCats.size > 0 ? [...activeCats].join(' + ') : baseKeyword;
   const dateLabel = dateFrom
-    ? (dateTo && dateTo.getTime() !== dateFrom.getTime()
-        ? `${fmtShort(dateFrom)} – ${fmtShort(dateTo)}`
-        : fmtShort(dateFrom))
+    ? (dateTo && dateTo.getTime() !== dateFrom.getTime() ? `${fmtShort(dateFrom)} – ${fmtShort(dateTo)}` : fmtShort(dateFrom))
     : 'Semua waktu';
   statusRight.textContent = `${filtered.length} artikel · ${kwLabel} · ${dateLabel}`;
 
@@ -605,15 +666,12 @@ function renderArticles() {
     card.style.animationDelay = `${idx * 0.03}s`;
     card.innerHTML = `
       <div class="card-source">${esc(article.source)}</div>
-      <a class="card-title" href="${esc(article.link)}" target="_blank" rel="noopener">
-        ${esc(article.title)}
-      </a>
+      <a class="card-title" href="${esc(article.link)}" target="_blank" rel="noopener">${esc(article.title)}</a>
       ${article.description ? `<p class="card-snippet">${esc(article.description)}</p>` : ''}
       <div class="card-footer">
         <span class="card-date">${fmt(article.pubDate)}</span>
         <a class="read-link" href="${esc(article.link)}" target="_blank" rel="noopener">Baca selengkapnya →</a>
-      </div>
-    `;
+      </div>`;
     grid.appendChild(card);
   });
   container.innerHTML = '';
@@ -621,26 +679,148 @@ function renderArticles() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// FIX 2: CALENDAR — prevent future month nav, fix disabled rendering
+// EXPORT TO CSV (Excel-compatible, UTF-8 BOM)
 // ═══════════════════════════════════════════════════════════════════
-const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni',
-                   'Juli','Agustus','September','Oktober','November','Desember'];
-const DAYS_ID   = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+function exportToCSV() {
+  if (!allArticles.length) return;
 
-let calYear, calMonth;
-let selStart = null;
-let selEnd   = null;
-let selecting = false;
+  const sorted = [...allArticles].sort((a,b) => (new Date(b.pubDate).getTime()||0) - (new Date(a.pubDate).getTime()||0));
+
+  const headers = ['No', 'Tanggal', 'Sumber', 'Judul', 'Deskripsi', 'Link'];
+  const rows = sorted.map((a, i) => [
+    i + 1,
+    fmt(a.pubDate),
+    a.source || '',
+    a.title || '',
+    (a.description || '').replace(/\r?\n/g, ' '),
+    a.link || '',
+  ].map(v => `"${String(v).replace(/"/g, '""')}"`));
+
+  const csv   = [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+  const blob  = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url   = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+
+  const kw   = (activeCats.size > 0 ? [...activeCats][0] : baseKeyword).replace(/\s+/g,'_').substring(0,20);
+  const date = new Date().toISOString().split('T')[0];
+  anchor.download = `PANTAU_${kw}_${date}.csv`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS PANEL
+// ═══════════════════════════════════════════════════════════════════
+function openSettings() {
+  renderSettingsSources();
+  renderSettingsKeywords();
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
+function handleSettingsOverlay(e) { if (e.target === document.getElementById('settingsOverlay')) closeSettings(); }
+
+function renderSettingsSources() {
+  const el = document.getElementById('settingsSources');
+  if (!config.sources.length) {
+    el.innerHTML = `<div style="font-size:0.78rem;color:var(--muted);padding:0.5rem 0">Belum ada sumber.</div>`;
+    return;
+  }
+  el.innerHTML = config.sources.map((d, i) => `
+    <div class="settings-item">
+      <span class="settings-item-label">${esc(d)}</span>
+      <button class="settings-del" onclick="deleteSource(${i})" title="Hapus">✕</button>
+    </div>`).join('');
+}
+
+function renderSettingsKeywords() {
+  const el = document.getElementById('settingsKeywords');
+  if (!config.keywords.length) {
+    el.innerHTML = `<div style="font-size:0.78rem;color:var(--muted);padding:0.5rem 0">Belum ada keyword.</div>`;
+    return;
+  }
+  el.innerHTML = config.keywords.map((k, i) => `
+    <div class="settings-item">
+      <div>
+        <div class="settings-item-label">${esc(k.label)}</div>
+        <div class="settings-item-sub">${esc(k.keyword)}</div>
+      </div>
+      <button class="settings-del" onclick="deleteKeyword(${i})" title="Hapus">✕</button>
+    </div>`).join('');
+}
+
+function addSource() {
+  const input = document.getElementById('newSourceInput');
+  const val   = input.value.trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\//,'');
+  if (!val || config.sources.includes(val)) { input.focus(); return; }
+  config.sources.push(val);
+  activeSources.add(val);
+  saveConfig();
+  renderSettingsSources();
+  renderSourceChips();
+  input.value = '';
+}
+
+function deleteSource(i) {
+  const domain = config.sources[i];
+  config.sources.splice(i, 1);
+  activeSources.delete(domain);
+  if (activeSources.size === 0 && config.sources.length > 0) activeSources.add(config.sources[0]);
+  saveConfig();
+  renderSettingsSources();
+  renderSourceChips();
+}
+
+function addKeyword() {
+  const labelEl   = document.getElementById('newKwLabel');
+  const keywordEl = document.getElementById('newKwKeyword');
+  const label     = labelEl.value.trim();
+  const keyword   = keywordEl.value.trim();
+  if (!label || !keyword) { (label ? keywordEl : labelEl).focus(); return; }
+  if (config.keywords.some(k => k.keyword === keyword)) { keywordEl.focus(); return; }
+  config.keywords.push({ label, keyword });
+  saveConfig();
+  renderSettingsKeywords();
+  renderCatChips();
+  labelEl.value = '';
+  keywordEl.value = '';
+}
+
+function deleteKeyword(i) {
+  const kw = config.keywords[i].keyword;
+  config.keywords.splice(i, 1);
+  activeCats.delete(kw);
+  saveConfig();
+  renderSettingsKeywords();
+  renderCatChips();
+}
+
+function resetToDefaults() {
+  if (!confirm('Reset ke konfigurasi default? Sumber dan keyword kustom akan hilang.')) return;
+  config = { sources: [...DEFAULT_SOURCES], keywords: DEFAULT_KEYWORDS.map(x => ({ ...x })) };
+  saveConfig();
+  activeSources = new Set(config.sources);
+  activeCats.clear();
+  renderSettingsSources();
+  renderSettingsKeywords();
+  renderSourceChips();
+  renderCatChips();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════════════════════════
+const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const DAYS_ID   = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+let calYear, calMonth, selStart = null, selEnd = null, selecting = false;
 
 function openCal(e) {
-  const overlay = document.getElementById('calOverlay');
-  const popover = document.getElementById('calPopover');
-  const trigger = document.getElementById('dateTrigger');
-  const rect    = trigger.getBoundingClientRect();
-  const top     = rect.bottom + 6;
-  const left    = Math.min(rect.left, window.innerWidth - 300);
-  popover.style.top  = top + 'px';
-  popover.style.left = left + 'px';
+  const overlay  = document.getElementById('calOverlay');
+  const popover  = document.getElementById('calPopover');
+  const trigger  = document.getElementById('dateTrigger');
+  const rect     = trigger.getBoundingClientRect();
+  popover.style.top  = (rect.bottom + 6) + 'px';
+  popover.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px';
 
   const today = new Date();
   calYear  = today.getFullYear();
@@ -648,158 +828,110 @@ function openCal(e) {
   selStart = dateFrom ? new Date(dateFrom) : null;
   selEnd   = dateTo   ? new Date(dateTo)   : null;
   selecting = false;
-
   overlay.classList.add('open');
   renderCal();
 }
-
-function closeCal() {
-  document.getElementById('calOverlay').classList.remove('open');
-  selecting = false;
-}
-
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('calOverlay')) closeCal();
-}
+function closeCal() { document.getElementById('calOverlay').classList.remove('open'); selecting = false; }
+function handleOverlayClick(e) { if (e.target === document.getElementById('calOverlay')) closeCal(); }
 
 function calNav(dir) {
   const today = new Date();
-  const todayYear  = today.getFullYear();
-  const todayMonth = today.getMonth();
-
-  let newMonth = calMonth + dir;
-  let newYear  = calYear;
-  if (newMonth > 11) { newMonth = 0;  newYear++; }
-  if (newMonth < 0)  { newMonth = 11; newYear--; }
-
-  // FIX: Block navigation to future months
-  if (newYear > todayYear || (newYear === todayYear && newMonth > todayMonth)) return;
-
-  calMonth = newMonth;
-  calYear  = newYear;
+  let nm = calMonth + dir, ny = calYear;
+  if (nm > 11) { nm = 0; ny++; }
+  if (nm < 0)  { nm = 11; ny--; }
+  if (ny > today.getFullYear() || (ny === today.getFullYear() && nm > today.getMonth())) return;
+  calMonth = nm; calYear = ny;
   renderCal();
 }
 
 function renderCal() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayYear  = today.getFullYear();
-  const todayMonth = today.getMonth();
-
-  document.getElementById('calMonthLabel').textContent =
-    MONTHS_ID[calMonth] + ' ' + calYear;
-
-  // FIX: Disable next-month nav button if already at current month
+  const today = new Date(); today.setHours(0,0,0,0);
+  document.getElementById('calMonthLabel').textContent = MONTHS_ID[calMonth] + ' ' + calYear;
   const nextBtn = document.getElementById('calNext');
-  const atCurrentMonth = (calYear === todayYear && calMonth === todayMonth);
-  nextBtn.disabled = atCurrentMonth;
+  nextBtn.disabled = (calYear === today.getFullYear() && calMonth === today.getMonth());
 
   const grid = document.getElementById('calGrid');
   let html = DAYS_ID.map(d => `<div class="cal-day-name">${d}</div>`).join('');
-
   const firstDow    = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
 
   for (let i = 0; i < firstDow; i++) html += `<div class="cal-day empty"></div>`;
 
   for (let d = 1; d <= daysInMonth; d++) {
-    const date = new Date(calYear, calMonth, d);
-    date.setHours(0, 0, 0, 0);
+    const date = new Date(calYear, calMonth, d); date.setHours(0,0,0,0);
     const isFuture = date > today;
-
     let cls = 'cal-day';
     if (isFuture) {
       cls += ' disabled';
     } else {
       if (date.getTime() === today.getTime()) cls += ' today';
-
       if (selStart && selEnd) {
         const lo = selStart <= selEnd ? selStart : selEnd;
         const hi = selStart <= selEnd ? selEnd   : selStart;
-        if (date.getTime() === lo.getTime()) cls += ' range-start';
-        else if (date.getTime() === hi.getTime()) cls += ' range-end';
-        else if (date > lo && date < hi) cls += ' in-range';
+        if (date.getTime() === lo.getTime())       cls += ' range-start';
+        else if (date.getTime() === hi.getTime())  cls += ' range-end';
+        else if (date > lo && date < hi)           cls += ' in-range';
       } else if (selStart && date.getTime() === selStart.getTime()) {
         cls += ' single-sel';
       }
     }
-
     const ds = `${calYear},${calMonth},${d}`;
-    html += `<button class="${cls}"
-               onclick="calClick(${ds})"
-               onmouseenter="calHover(${ds})">${d}</button>`;
+    html += `<button class="${cls}" onclick="calClick(${ds})" onmouseenter="calHover(${ds})">${d}</button>`;
   }
-
   grid.innerHTML = html;
   updateCalFooter();
 }
 
 function calClick(y, m, d) {
-  const clicked = new Date(y, m, d);
-  clicked.setHours(0, 0, 0, 0);
-
-  if (!selecting || !selStart) {
-    selStart  = clicked;
-    selEnd    = null;
-    selecting = true;
-  } else {
-    selEnd    = clicked;
-    selecting = false;
-  }
+  const clicked = new Date(y, m, d); clicked.setHours(0,0,0,0);
+  if (!selecting || !selStart) { selStart = clicked; selEnd = null; selecting = true; }
+  else                          { selEnd = clicked; selecting = false; }
   renderCal();
 }
-
 function calHover(y, m, d) {
   if (!selecting || !selStart) return;
-  selEnd = new Date(y, m, d);
-  selEnd.setHours(0, 0, 0, 0);
+  selEnd = new Date(y, m, d); selEnd.setHours(0,0,0,0);
   renderCal();
 }
-
 function updateCalFooter() {
   const info = document.getElementById('calFooterInfo');
   const hint = document.getElementById('calModeHint');
-
   if (!selStart) {
-    info.textContent = '';
-    hint.textContent = 'Klik tanggal pertama';
+    info.textContent = ''; hint.textContent = 'Klik tanggal pertama';
   } else if (selecting) {
-    info.textContent = `Dari: ${fmtShort(selStart)}`;
-    hint.textContent = 'Klik tanggal akhir (atau tanggal yang sama)';
+    info.textContent = `Dari: ${fmtShort(selStart)}`; hint.textContent = 'Klik tanggal akhir';
   } else {
     const lo = selStart <= selEnd ? selStart : selEnd;
     const hi = selStart <= selEnd ? selEnd   : selStart;
-    info.textContent = lo.getTime() === hi.getTime()
-      ? fmtShort(lo)
-      : `${fmtShort(lo)} – ${fmtShort(hi)}`;
+    info.textContent = lo.getTime() === hi.getTime() ? fmtShort(lo) : `${fmtShort(lo)} – ${fmtShort(hi)}`;
     hint.textContent = 'Klik Apply atau pilih ulang';
   }
 }
-
 function applyDate() {
   if (!selStart) { closeCal(); return; }
-
   const lo = (!selEnd || selStart <= selEnd) ? selStart : selEnd;
   const hi = (!selEnd || selStart <= selEnd) ? (selEnd || selStart) : selStart;
-
   dateFrom = new Date(lo); dateFrom.setHours(0,0,0,0);
   dateTo   = new Date(hi); dateTo.setHours(23,59,59,999);
 
+  const rangeDays = Math.ceil((dateTo.getTime() - dateFrom.getTime()) / 86400000) + 1;
   const label = document.getElementById('dateLabel');
-  label.textContent = dateFrom.getTime() === (dateTo.getTime() - 86399999)
+  label.textContent = dateFrom.getTime() === dateTo.getTime() - 86399999
     ? fmtShort(dateFrom)
     : `${fmtShort(dateFrom)} – ${fmtShort(dateTo)}`;
 
+  if (rangeDays > 7) {
+    const nBatches = Math.ceil(rangeDays / 7);
+    label.textContent += ` (${nBatches} batch, maks ~${nBatches*100} artikel)`;
+  }
+
   document.getElementById('dateTrigger').classList.add('has-date');
   document.getElementById('dateClear').style.display = 'inline';
-
   closeCal();
-  renderArticles();
+  loadNews();
 }
-
 function clearDate() {
-  dateFrom = null; dateTo = null;
-  selStart = null; selEnd = null;
+  dateFrom = null; dateTo = null; selStart = null; selEnd = null;
   document.getElementById('dateLabel').textContent = 'Pilih tanggal';
   document.getElementById('dateTrigger').classList.remove('has-date');
   document.getElementById('dateClear').style.display = 'none';
@@ -809,6 +941,8 @@ function clearDate() {
 // ═══════════════════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════════════════
+renderSourceChips();
+renderCatChips();
 loadNews();
 </script>
 </body>
