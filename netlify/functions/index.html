@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PANTAU — Berita Pemerintahan Indonesia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --surface2: #1e1e1e;
+      --border: #2a2a2a;
+      --text: #e8e2d9;
+      --muted: #7a7469;
+      --accent: #c9252d;
+      --accent-dim: rgba(201,37,45,0.12);
+      --gold: #c8a96e;
+      --gold-dim: rgba(200,169,110,0.12);
+      --green: #22c55e;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Source Sans 3', system-ui, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────────────── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      position: sticky; top: 0;
+      background: rgba(13,13,13,0.96);
+      backdrop-filter: blur(12px);
+      z-index: 200;
+    }
+    .header-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem; padding: 1rem 0;
+    }
+    .brand { display: flex; align-items: baseline; gap: 0.6rem; flex-shrink: 0; }
+    .brand-name { font-family: var(--font-serif); font-size: 1.7rem; font-weight: 900; letter-spacing: 0.12em; }
+    .brand-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; margin-bottom: 3px; }
+    .brand-sub { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+
+    /* FIX 1: Nav links */
+    .nav-links { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; }
+    .nav-link {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.35rem 0.75rem; border: 1px solid transparent;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .nav-link:hover { color: var(--text); border-color: var(--border); }
+    .nav-link.active { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+
+    .search-form { display: flex; gap: 0.5rem; flex: 1; max-width: 520px; }
+    .search-input {
+      flex: 1; background: var(--surface2);
+      border: 1px solid var(--border); color: var(--text);
+      padding: 0.55rem 1rem; font-family: var(--font-sans);
+      font-size: 0.9rem; font-weight: 300; outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--muted); }
+    .btn {
+      background: var(--accent); color: #fff; border: none;
+      padding: 0.55rem 1.2rem; font-family: var(--font-sans);
+      font-size: 0.85rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; cursor: pointer; transition: background 0.2s; white-space: nowrap;
+    }
+    .btn:hover { background: #a51d24; }
+
+    /* ── FILTER BAR — FIX 3: Sticky ────────────────────────────────── */
+    .filter-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      /* top set by JS after measuring header height */
+      z-index: 150;
+    }
+    .filter-row {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; gap: 0.45rem; align-items: center;
+      padding: 0.5rem 2rem; overflow-x: auto;
+    }
+    .filter-row + .filter-row { border-top: 1px solid var(--border); }
+    .filter-label {
+      font-size: 0.67rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); margin-right: 0.3rem; white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* Chip base */
+    .chip {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      padding: 0.28rem 0.85rem; font-size: 0.77rem; font-family: var(--font-sans);
+      cursor: pointer; transition: all 0.15s; white-space: nowrap; line-height: 1.4;
+    }
+
+    /* Source — green */
+    .source-chip { display: flex; align-items: center; gap: 0.4rem; }
+    .source-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.15s; flex-shrink: 0; }
+    .source-chip.active { border-color: var(--green); color: var(--text); }
+    .source-chip.active .dot { background: var(--green); }
+    .source-chip:hover { border-color: #22c55e55; color: var(--text); }
+
+    /* Category — red, multi-select */
+    .cat-chip:hover { border-color: #c9252d55; color: var(--text); }
+    .cat-chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--text); }
+
+    /* Date button — gold */
+    .date-trigger {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      padding: 0.28rem 0.85rem; font-size: 0.77rem; font-family: var(--font-sans);
+      cursor: pointer; transition: all 0.15s; white-space: nowrap; line-height: 1.4;
+    }
+    .date-trigger:hover { border-color: #c8a96e55; color: var(--text); }
+    .date-trigger.has-date { background: var(--gold-dim); border-color: var(--gold); color: var(--text); }
+    .date-trigger-icon { font-size: 0.8rem; }
+    .date-clear {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 0.85rem; padding: 0 0 0 0.1rem;
+      line-height: 1; transition: color 0.15s;
+    }
+    .date-clear:hover { color: var(--accent); }
+
+    /* ── CALENDAR POPOVER ────────────────────────────────────────────── */
+    .cal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+    }
+    .cal-overlay.open { display: block; }
+    .cal-popover {
+      position: absolute;
+      background: #1a1a1a; border: 1px solid var(--border);
+      padding: 1rem; min-width: 280px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+    }
+    .cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .cal-nav {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 1rem; padding: 0.2rem 0.5rem;
+      transition: color 0.15s;
+    }
+    .cal-nav:hover:not(:disabled) { color: var(--text); }
+    .cal-nav:disabled { opacity: 0.2; cursor: default; }
+    .cal-month-label {
+      font-size: 0.85rem; font-weight: 600; color: var(--text); letter-spacing: 0.05em;
+    }
+    .cal-mode-hint {
+      font-size: 0.68rem; color: var(--muted); text-align: center;
+      margin-bottom: 0.6rem; letter-spacing: 0.03em;
+    }
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+    }
+    .cal-day-name {
+      font-size: 0.65rem; color: var(--muted); text-align: center;
+      padding: 0.2rem 0; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .cal-day {
+      font-size: 0.78rem; text-align: center; padding: 0.35rem 0;
+      cursor: pointer; border-radius: 2px; transition: all 0.1s; color: var(--muted);
+      background: transparent; border: none; font-family: var(--font-sans);
+    }
+    .cal-day:hover:not(.empty):not(.disabled) { background: var(--surface2); color: var(--text); }
+    .cal-day.empty { cursor: default; }
+    .cal-day.future { visibility: hidden; cursor: default; pointer-events: none; }
+    .cal-day.today { color: var(--gold); }
+    .cal-day.in-range { background: rgba(200,169,110,0.15); color: var(--text); border-radius: 0; }
+    .cal-day.range-start, .cal-day.range-end {
+      background: var(--gold); color: #111; font-weight: 600; border-radius: 2px;
+    }
+    .cal-day.single-sel { background: var(--gold); color: #111; font-weight: 600; }
+    .cal-footer {
+      margin-top: 0.75rem; padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;
+    }
+    .cal-footer-info {
+      flex: 1; font-size: 0.72rem; color: var(--muted);
+    }
+    .cal-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      padding: 0.3rem 0.7rem; font-size: 0.75rem; font-family: var(--font-sans);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .cal-btn:hover { border-color: var(--gold); color: var(--text); }
+    .cal-btn.primary { background: var(--gold); border-color: var(--gold); color: #111; font-weight: 600; }
+    .cal-btn.primary:hover { background: #b8994e; }
+
+    /* ── MAIN ────────────────────────────────────────────────────────── */
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 2rem; }
+
+    /* FIX 3: Status bar sticky */
+    .status-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; font-size: 0.78rem; color: var(--muted);
+      border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; gap: 1rem;
+      position: sticky;
+      /* top set by JS */
+      z-index: 90;
+      background: var(--bg);
+      padding-top: 0.75rem;
+      margin-top: -0.75rem;
+    }
+    .live-dot {
+      display: inline-block; width: 6px; height: 6px;
+      background: var(--green); border-radius: 50%; margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .loading { text-align: center; padding: 4rem 2rem; color: var(--muted); }
+    .loading-spinner {
+      width: 32px; height: 32px; border: 2px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box { border: 1px solid var(--accent); background: var(--accent-dim); padding: 1rem 1.5rem; font-size: 0.9rem; }
+
+    /* NEWS GRID */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1px; background: var(--border);
+    }
+    .card {
+      background: var(--bg); padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 0.75rem;
+      transition: background 0.2s; animation: fadeUp 0.35s ease both;
+    }
+    .card:hover { background: var(--surface); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .card-source { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+    .card-title { font-family: var(--font-serif); font-size: 1.12rem; font-weight: 700; line-height: 1.4; color: var(--text); text-decoration: none; display: block; }
+    .card-title:hover { color: var(--gold); }
+    .card-snippet { font-size: 0.85rem; color: #9a9390; line-height: 1.65; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem; }
+    .card-date { font-size: 0.72rem; color: var(--muted); }
+    .read-link { font-size: 0.75rem; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .read-link:hover { color: var(--gold); }
+
+    .empty { text-align: center; padding: 4rem 2rem; color: var(--muted); grid-column: 1/-1; }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
+
+    footer { text-align: center; padding: 2rem; font-size: 0.75rem; color: var(--muted); border-top: 1px solid var(--border); margin-top: 3rem; letter-spacing: 0.05em; }
+
+    .action-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      padding: 0.25rem 0.7rem; font-size: 0.73rem; font-family: var(--font-sans);
+      cursor: pointer; transition: all 0.15s; white-space: nowrap; display: inline-flex;
+      align-items: center; gap: 0.35rem; letter-spacing: 0.03em;
+    }
+    .action-btn:hover { border-color: var(--text); color: var(--text); }
+    .action-btn.reset:hover { border-color: var(--accent); color: var(--accent); }
+    .action-btn.refresh:hover { border-color: var(--green); color: var(--green); }
+    .action-btn svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+    /* Status data: cadangan / gagal memperbarui */
+    .live-dot.warn { background: var(--gold); animation: none; }
+    .notice-bar {
+      display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+      border: 1px solid var(--gold); background: var(--gold-dim); color: var(--text);
+      font-size: 0.82rem; padding: 0.6rem 1rem; margin-bottom: 1rem; line-height: 1.5;
+    }
+    .link-btn {
+      background: none; border: none; padding: 0; cursor: pointer;
+      color: var(--gold); text-decoration: underline; font: inherit;
+    }
+    .error-box .error-hint { color: var(--muted); display: block; margin-top: 0.35rem; font-size: 0.82rem; }
+    .error-box .action-btn { margin-top: 0.9rem; }
+    #refreshIcon { transition: transform 0.5s; }
+    .spinning #refreshIcon { animation: spin 0.7s linear infinite; }
+
+    @media (max-width: 640px) {
+      .header-inner { flex-wrap: wrap; }
+      .search-form { max-width: 100%; order: 3; width: 100%; }
+      .nav-links { order: 2; }
+      main { padding: 0 1rem; }
+      .filter-row { padding: 0.5rem 1rem; }
+      .status-bar { flex-wrap: wrap; gap: 0.5rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-name">PANTAU</span>
+      <div class="brand-dot"></div>
+      <span class="brand-sub">Pemerintahan RI</span>
+    </div>
+
+    <!-- FIX 1: Nav links — active state set by JS -->
+    <div class="nav-links">
+      <a class="nav-link" id="navBerita" href="/">Berita</a>
+      <a class="nav-link" id="navFormatter" href="/formatter.html">Formatter</a>
+    </div>
+
+    <div class="search-form">
+      <input id="searchInput" class="search-input" type="text"
+        placeholder="Cari topik, kementerian, kebijakan..."
+        value="pemerintah Indonesia" />
+      <button class="btn" onclick="doSearch()">Cari</button>
+    </div>
+  </div>
+</header>
+
+<div class="filter-bar" id="filterBar">
+  <!-- ROW 1: Sumber -->
+  <div class="filter-row">
+    <span class="filter-label">Sumber:</span>
+    <button class="chip source-chip active" data-source="detik.com"    onclick="toggleSource(this)"><span class="dot"></span>detik.com</button>
+    <button class="chip source-chip active" data-source="kompas.com"   onclick="toggleSource(this)"><span class="dot"></span>kompas.com</button>
+    <button class="chip source-chip active" data-source="kumparan.com" onclick="toggleSource(this)"><span class="dot"></span>kumparan.com</button>
+    <button class="chip source-chip active" data-source="liputan6.com" onclick="toggleSource(this)"><span class="dot"></span>liputan6.com</button>
+    <button class="chip source-chip active" data-source="tempo.co"     onclick="toggleSource(this)"><span class="dot"></span>tempo.co</button>
+  </div>
+
+  <!-- ROW 2: Kategori (multi-select) -->
+  <div class="filter-row">
+    <span class="filter-label">Kategori:</span>
+    <button class="chip cat-chip" data-keyword="Prabowo"                                                 onclick="toggleCat(this)">Prabowo</button>
+    <button class="chip cat-chip" data-keyword="Gibran"                                                  onclick="toggleCat(this)">Gibran</button>
+    <button class="chip cat-chip" data-keyword="kebijakan pemerintah Indonesia"                          onclick="toggleCat(this)">Kebijakan Pemerintah</button>
+    <button class="chip cat-chip" data-keyword="pemerintah Indonesia hubungan luar negeri internasional" onclick="toggleCat(this)">Global</button>
+    <button class="chip cat-chip" data-keyword="nadiem" onclick="toggleCat(this)">Nadiem</button>
+    <button class="chip cat-chip" data-keyword="kasus chromebook" onclick="toggleCat(this)">Kasus Chromebook</button>
+    <button class="chip cat-chip" data-keyword="kejaksaan" onclick="toggleCat(this)">Kejaksaan</button>
+    <button class="chip cat-chip" data-keyword="kasus hukum indonesia" onclick="toggleCat(this)">Kasus Hukum Indonesia</button>
+  </div>
+
+  <!-- ROW 3: Tanggal -->
+  <div class="filter-row">
+    <span class="filter-label">Tanggal:</span>
+    <button class="date-trigger" id="dateTrigger" onclick="openCal(event)">
+      <span class="date-trigger-icon">📅</span>
+      <span id="dateLabel">Pilih tanggal</span>
+    </button>
+    <button class="date-clear" id="dateClear" style="display:none" onclick="clearDate()" title="Hapus filter tanggal">✕</button>
+  </div>
+</div>
+
+<!-- Calendar overlay -->
+<div class="cal-overlay" id="calOverlay" onclick="handleOverlayClick(event)">
+  <div class="cal-popover" id="calPopover" onclick="event.stopPropagation()">
+    <div class="cal-header">
+      <button class="cal-nav" id="calPrev" onclick="calNav(-1)">‹</button>
+      <span class="cal-month-label" id="calMonthLabel"></span>
+      <button class="cal-nav" id="calNext" onclick="calNav(1)">›</button>
+    </div>
+    <div class="cal-mode-hint" id="calModeHint">Klik satu tanggal atau drag untuk rentang</div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-footer">
+      <span class="cal-footer-info" id="calFooterInfo"></span>
+      <button class="cal-btn" onclick="closeCal()">Batal</button>
+      <button class="cal-btn primary" id="calApplyBtn" onclick="applyDate()">Terapkan</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="status-bar" id="statusBar">
+    <span><span class="live-dot" id="liveDot"></span><span id="statusLeft">Google News RSS</span></span>
+    <span id="statusRight">Memuat berita...</span>
+    <span style="display:flex;gap:0.4rem;flex-shrink:0">
+      <button class="action-btn reset" onclick="resetAll()" title="Reset semua filter">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 8a6 6 0 1 0 1.2-3.6"/><path d="M2 3.5V8h4.5"/>
+        </svg>
+        Reset Filter
+      </button>
+      <button class="action-btn refresh" id="refreshBtn" onclick="refreshNews()" title="Refresh berita">
+        <svg id="refreshIcon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13.5 8a5.5 5.5 0 1 1-1.1-3.3"/><path d="M13.5 3v3h-3"/>
+        </svg>
+        Refresh
+      </button>
+    </span>
+  </div>
+  <div id="newsContainer">
+    <div class="loading"><div class="loading-spinner"></div>Mengambil berita terbaru...</div>
+  </div>
+</main>
+
+<footer>PANTAU · Netlify Functions · Sumber: Google News</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// FIX 1: Active nav detection
+// ═══════════════════════════════════════════════════════════════════
+(function() {
+  const path = window.location.pathname;
+  const isFormatter = path.includes('formatter');
+  document.getElementById('navBerita').classList.toggle('active', !isFormatter);
+  document.getElementById('navFormatter').classList.toggle('active', isFormatter);
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// FIX 3: Sticky positions — calculated after fonts/layout settle
+// ═══════════════════════════════════════════════════════════════════
+function updateStickyPositions() {
+  const headerH = document.querySelector('header').offsetHeight;
+  const filterBar = document.getElementById('filterBar');
+  filterBar.style.top = headerH + 'px';
+  const filterH = filterBar.offsetHeight;
+  const statusBar = document.getElementById('statusBar');
+  statusBar.style.top = (headerH + filterH) + 'px';
+}
+window.addEventListener('load', updateStickyPositions);
+window.addEventListener('resize', updateStickyPositions);
+// Run immediately too in case fonts are cached
+updateStickyPositions();
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+let baseKeyword   = 'pemerintah Indonesia';
+let activeCats    = new Set();
+let activeSources = new Set(['detik.com','kompas.com','kumparan.com','liputan6.com','tempo.co']);
+let allArticles   = [];
+let dateFrom = null;
+let dateTo   = null;
+
+// ═══════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function esc(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmt(dateStr) {
+  if (!dateStr) return '';
+  try {
+    return new Date(dateStr).toLocaleDateString('id-ID', {
+      day:'numeric', month:'short', year:'numeric',
+      hour:'2-digit', minute:'2-digit'
+    });
+  } catch { return dateStr; }
+}
+function fmtShort(d) {
+  if (!d) return '';
+  return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SOURCE TOGGLE
+// ═══════════════════════════════════════════════════════════════════
+function toggleSource(btn) {
+  const src = btn.dataset.source;
+  if (activeSources.has(src)) {
+    if (activeSources.size === 1) return;
+    activeSources.delete(src);
+    btn.classList.remove('active');
+  } else {
+    activeSources.add(src);
+    btn.classList.add('active');
+  }
+  scheduleLoad();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CATEGORY TOGGLE
+// ═══════════════════════════════════════════════════════════════════
+function toggleCat(btn) {
+  const kw = btn.dataset.keyword;
+  if (activeCats.has(kw)) {
+    activeCats.delete(kw);
+    btn.classList.remove('active');
+  } else {
+    activeCats.add(kw);
+    btn.classList.add('active');
+  }
+  scheduleLoad();
+}
+
+function buildKeyword() {
+  if (activeCats.size === 0) return baseKeyword;
+  return [...activeCats].join(' OR ');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════════════
+function doSearch() {
+  const val = document.getElementById('searchInput').value.trim();
+  if (!val) return;
+  baseKeyword = val;
+  activeCats.clear();
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  loadNews();
+}
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// RESET & REFRESH
+// ═══════════════════════════════════════════════════════════════════
+function resetAll() {
+  activeSources = new Set(['detik.com','kompas.com','kumparan.com','liputan6.com','tempo.co']);
+  document.querySelectorAll('.source-chip').forEach(b => b.classList.add('active'));
+  activeCats.clear();
+  document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+  clearDate(false);   // jangan reload dulu, cukup sekali di bawah
+  baseKeyword = 'pemerintah Indonesia';
+  document.getElementById('searchInput').value = baseKeyword;
+  loadNews();
+}
+
+function refreshNews() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  loadNews().finally(() => {
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FETCH — retry otomatis, batalkan request lama, debounce klik filter
+// ═══════════════════════════════════════════════════════════════════
+const RETRY_DELAYS_MS    = [1500, 4000];  // jeda sebelum percobaan ke-2 dan ke-3
+const FILTER_DEBOUNCE_MS = 400;           // klik beberapa chip cepat = 1 request
+
+let currentCtrl   = null;  // AbortController untuk request yang sedang jalan
+let loadTimer     = null;  // timer debounce filter
+let shownKey      = null;  // URL query yang hasilnya sedang tampil
+let lastFetchMeta = null;  // { fetchedAt, source } dari response terakhir
+
+function scheduleLoad() {
+  clearTimeout(loadTimer);
+  loadTimer = setTimeout(loadNews, FILTER_DEBOUNCE_MS);
+}
+
+function toYMD(d) {
+  if (!d) return '';
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function buildFetchUrl() {
+  const keyword    = buildKeyword();
+  const sources    = [...activeSources].join(',');
+  // dateTo eksklusif di server → kirim sehari setelah tanggal akhir
+  const beforeDate = dateTo ? new Date(dateTo.getTime() + 86400000) : null;
+  let url = `/.netlify/functions/fetch-news` +
+    `?keyword=${encodeURIComponent(keyword)}` +
+    `&sources=${encodeURIComponent(sources)}`;
+  if (dateFrom)   url += `&dateFrom=${toYMD(dateFrom)}`;
+  if (beforeDate) url += `&dateTo=${toYMD(beforeDate)}`;
+  return url;
+}
+
+function makeFetchError(message, retryable) {
+  const err = new Error(message);
+  err.retryable = retryable;
+  return err;
+}
+
+async function fetchOnce(url, signal) {
+  let res;
+  try {
+    res = await fetch(url, { signal });
+  } catch (err) {
+    if (err.name === 'AbortError') throw err;
+    throw makeFetchError('Koneksi ke server PANTAU terputus.', true);
+  }
+
+  let data = null;
+  try { data = await res.json(); } catch { /* bukan JSON, mis. halaman error Netlify */ }
+
+  if (res.ok && Array.isArray(data)) {
+    return {
+      articles:  data,
+      fetchedAt: res.headers.get('X-Pantau-Fetched-At'),
+      source:    res.headers.get('X-Pantau-Source') || 'live',
+    };
+  }
+
+  const message = (data && data.message)
+    || (res.ok ? 'Respons server tidak valid.' : `Server mengembalikan status ${res.status}.`);
+  const retryable = !res.ok ? (res.status >= 500 || res.status === 429) : true;
+  throw makeFetchError(message, retryable);
+}
+
+function sleepAbortable(ms, signal) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(resolve, ms);
+    signal.addEventListener('abort', () => {
+      clearTimeout(t);
+      reject(new DOMException('Aborted', 'AbortError'));
+    }, { once: true });
+  });
+}
+
+function setLoading(msg) {
+  document.getElementById('newsContainer').innerHTML =
+    `<div class="loading"><div class="loading-spinner"></div>${esc(msg)}</div>`;
+}
+
+async function loadNews() {
+  clearTimeout(loadTimer);
+  if (currentCtrl) currentCtrl.abort();      // batalkan request lama (mis. filter berganti)
+  const ctrl = new AbortController();
+  currentCtrl = ctrl;
+
+  const url         = buildFetchUrl();
+  const statusRight = document.getElementById('statusRight');
+  // Refresh untuk query yang sama: biarkan berita lama tetap tampil
+  const keepGrid    = (url === shownKey) && allArticles.length > 0;
+
+  if (!keepGrid) setLoading('Mengambil berita...');
+  statusRight.textContent = keepGrid ? 'Memperbarui...' : 'Memuat...';
+
+  const maxAttempts = RETRY_DELAYS_MS.length + 1;
+  let lastErr = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      if (attempt > 1) {
+        const msg = `${lastErr.message} Mencoba lagi (${attempt}/${maxAttempts})...`;
+        if (keepGrid) statusRight.textContent = msg; else setLoading(msg);
+        await sleepAbortable(RETRY_DELAYS_MS[attempt - 2], ctrl.signal);
+      }
+
+      const result = await fetchOnce(url, ctrl.signal);
+      if (ctrl !== currentCtrl) return;      // sudah ada request yang lebih baru
+
+      allArticles   = result.articles;
+      lastFetchMeta = result;
+      shownKey      = url;
+      currentCtrl   = null;
+      renderArticles();
+      updateFreshness();
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') return; // dibatalkan oleh request baru
+      lastErr = err;
+      if (!err.retryable) break;
+    }
+  }
+
+  if (ctrl !== currentCtrl) return;
+  currentCtrl = null;
+  showLoadError(lastErr, keepGrid);
+}
+
+function showLoadError(err, keepGrid) {
+  const container   = document.getElementById('newsContainer');
+  const statusRight = document.getElementById('statusRight');
+  const msg = err ? err.message : 'Gagal mengambil berita.';
+
+  if (keepGrid) {
+    // Berita lama tetap tampil, beri catatan di atasnya
+    container.querySelector('.notice-bar')?.remove();
+    const bar = document.createElement('div');
+    bar.className = 'notice-bar';
+    bar.innerHTML = `<span>⚠ ${esc(msg)} Menampilkan data terakhir.</span>` +
+                    `<button class="link-btn" onclick="loadNews()">Coba lagi</button>`;
+    container.prepend(bar);
+    statusRight.textContent = statusSummary(allArticles.length);
+    return;
+  }
+
+  allArticles = [];
+  shownKey    = null;
+  container.innerHTML = `
+    <div class="error-box">
+      ⚠ ${esc(msg)}
+      <span class="error-hint">Sudah dicoba ${RETRY_DELAYS_MS.length + 1} kali. Biasanya pulih dalam beberapa menit.</span>
+      <button class="action-btn refresh" onclick="loadNews()">Coba lagi</button>
+    </div>`;
+  statusRight.textContent = 'Gagal memuat';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FRESHNESS — kapan data terakhir diambil dari Google
+// ═══════════════════════════════════════════════════════════════════
+function ageLabel(iso) {
+  const mins = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 60000));
+  if (mins < 1)  return 'baru saja';
+  if (mins < 60) return `${mins} mnt lalu`;
+  return `${Math.floor(mins / 60)} jam lalu`;
+}
+
+function updateFreshness() {
+  const el  = document.getElementById('statusLeft');
+  const dot = document.getElementById('liveDot');
+  if (!lastFetchMeta || !lastFetchMeta.fetchedAt || isNaN(Date.parse(lastFetchMeta.fetchedAt))) {
+    el.textContent = 'Google News RSS';
+    dot.classList.remove('warn');
+    return;
+  }
+  const isStale = lastFetchMeta.source === 'stale';
+  el.textContent = isStale
+    ? `Google News RSS · data cadangan (${ageLabel(lastFetchMeta.fetchedAt)})`
+    : `Google News RSS · diperbarui ${ageLabel(lastFetchMeta.fetchedAt)}`;
+  dot.classList.toggle('warn', isStale);
+}
+setInterval(updateFreshness, 60000);
+
+// ═══════════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════════
+function dateRangeLabel() {
+  if (!dateFrom) return 'Semua waktu';
+  const sameDay = !dateTo || dateFrom.toDateString() === dateTo.toDateString();
+  return sameDay ? fmtShort(dateFrom) : `${fmtShort(dateFrom)} – ${fmtShort(dateTo)}`;
+}
+
+function statusSummary(count) {
+  const kwLabel = activeCats.size > 0 ? [...activeCats].join(' + ') : baseKeyword;
+  return `${count} artikel · ${kwLabel} · ${dateRangeLabel()}`;
+}
+
+function renderArticles() {
+  const container   = document.getElementById('newsContainer');
+  const statusRight = document.getElementById('statusRight');
+
+  const sorted = [...allArticles].sort((a, b) => {
+    const ta = new Date(a.pubDate).getTime() || 0;
+    const tb = new Date(b.pubDate).getTime() || 0;
+    return tb - ta;
+  });
+
+  if (sorted.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">📭</div>
+        Tidak ada berita ditemukan${dateFrom ? ' pada tanggal ini' : ''}.
+      </div>`;
+    statusRight.textContent = '0 artikel';
+    return;
+  }
+
+  statusRight.textContent = statusSummary(sorted.length);
+
+  const grid = document.createElement('div');
+  grid.className = 'news-grid';
+  sorted.forEach((article, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.animationDelay = `${Math.min(idx, 20) * 0.03}s`;
+    card.innerHTML = `
+      <div class="card-source">${esc(article.source)}</div>
+      <a class="card-title" href="${esc(article.link)}" target="_blank" rel="noopener">
+        ${esc(article.title)}
+      </a>
+      ${article.description ? `<p class="card-snippet">${esc(article.description)}</p>` : ''}
+      <div class="card-footer">
+        <span class="card-date">${fmt(article.pubDate)}</span>
+        <a class="read-link" href="${esc(article.link)}" target="_blank" rel="noopener">Baca selengkapnya →</a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  container.innerHTML = '';
+  if (lastFetchMeta && lastFetchMeta.source === 'stale') {
+    const bar = document.createElement('div');
+    bar.className = 'notice-bar';
+    bar.innerHTML = `<span>⚠ Google News sedang membatasi akses. Menampilkan hasil terakhir yang tersimpan` +
+      (lastFetchMeta.fetchedAt ? ` (diambil ${ageLabel(lastFetchMeta.fetchedAt)})` : '') +
+      `.</span><button class="link-btn" onclick="loadNews()">Coba lagi</button>`;
+    container.appendChild(bar);
+  }
+  container.appendChild(grid);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FIX 2: CALENDAR — prevent future month nav, fix disabled rendering
+// ═══════════════════════════════════════════════════════════════════
+const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni',
+                   'Juli','Agustus','September','Oktober','November','Desember'];
+const DAYS_ID   = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+
+let calYear, calMonth;
+let selStart = null;
+let selEnd   = null;
+let selecting = false;
+
+function openCal(e) {
+  const overlay = document.getElementById('calOverlay');
+  const popover = document.getElementById('calPopover');
+  const trigger = document.getElementById('dateTrigger');
+  const rect    = trigger.getBoundingClientRect();
+  const top     = rect.bottom + 6;
+  const left    = Math.min(rect.left, window.innerWidth - 300);
+  popover.style.top  = top + 'px';
+  popover.style.left = left + 'px';
+
+  const today = new Date();
+  calYear  = today.getFullYear();
+  calMonth = today.getMonth();
+  selStart = dateFrom ? new Date(dateFrom) : null;
+  selEnd   = dateTo   ? new Date(dateTo)   : null;
+  selecting = false;
+
+  overlay.classList.add('open');
+  renderCal();
+}
+
+function closeCal() {
+  document.getElementById('calOverlay').classList.remove('open');
+  selecting = false;
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('calOverlay')) closeCal();
+}
+
+function calNav(dir) {
+  const today = new Date();
+  const todayYear  = today.getFullYear();
+  const todayMonth = today.getMonth();
+
+  let newMonth = calMonth + dir;
+  let newYear  = calYear;
+  if (newMonth > 11) { newMonth = 0;  newYear++; }
+  if (newMonth < 0)  { newMonth = 11; newYear--; }
+
+  // FIX: Block navigation to future months
+  if (newYear > todayYear || (newYear === todayYear && newMonth > todayMonth)) return;
+
+  calMonth = newMonth;
+  calYear  = newYear;
+  renderCal();
+}
+
+function renderCal() {
+  const now    = new Date();
+  const todayY = now.getFullYear();
+  const todayM = now.getMonth();
+  const todayD = now.getDate();
+
+  document.getElementById('calMonthLabel').textContent = MONTHS_ID[calMonth] + ' ' + calYear;
+  document.getElementById('calNext').disabled = (calYear === todayY && calMonth === todayM);
+
+  const firstDow    = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+  let html = DAYS_ID.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+  for (let i = 0; i < firstDow; i++) html += `<div class="cal-day empty"></div>`;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isFuture = (calYear > todayY)
+      || (calYear === todayY && calMonth > todayM)
+      || (calYear === todayY && calMonth === todayM && d > todayD);
+
+    if (isFuture) { html += `<div class="cal-day future"></div>`; continue; }
+
+    const isToday = (calYear === todayY && calMonth === todayM && d === todayD);
+    const date    = new Date(calYear, calMonth, d, 0, 0, 0, 0);
+    let cls = 'cal-day' + (isToday ? ' today' : '');
+
+    if (selStart && selEnd) {
+      const lo = selStart <= selEnd ? selStart : selEnd;
+      const hi = selStart <= selEnd ? selEnd   : selStart;
+      if      (date.getTime() === lo.getTime()) cls += ' range-start';
+      else if (date.getTime() === hi.getTime()) cls += ' range-end';
+      else if (date > lo && date < hi)          cls += ' in-range';
+    } else if (selStart && date.getTime() === selStart.getTime()) {
+      cls += ' single-sel';
+    }
+
+    const ds = `${calYear},${calMonth},${d}`;
+    html += `<button class="${cls}" onclick="calClick(${ds})" onmouseenter="calHover(${ds})">${d}</button>`;
+  }
+
+  document.getElementById('calGrid').innerHTML = html;
+  updateCalFooter();
+}
+
+function calClick(y, m, d) {
+  const clicked = new Date(y, m, d);
+  clicked.setHours(0, 0, 0, 0);
+
+  if (!selecting || !selStart) {
+    selStart  = clicked;
+    selEnd    = null;
+    selecting = true;
+  } else {
+    selEnd    = clicked;
+    selecting = false;
+  }
+  renderCal();
+}
+
+function calHover(y, m, d) {
+  if (!selecting || !selStart) return;
+  selEnd = new Date(y, m, d);
+  selEnd.setHours(0, 0, 0, 0);
+  renderCal();
+}
+
+function updateCalFooter() {
+  const info = document.getElementById('calFooterInfo');
+  const hint = document.getElementById('calModeHint');
+
+  if (!selStart) {
+    info.textContent = '';
+    hint.textContent = 'Klik tanggal pertama';
+  } else if (selecting) {
+    info.textContent = `Dari: ${fmtShort(selStart)}`;
+    hint.textContent = 'Klik tanggal akhir (atau tanggal yang sama)';
+  } else {
+    const lo = selStart <= selEnd ? selStart : selEnd;
+    const hi = selStart <= selEnd ? selEnd   : selStart;
+    info.textContent = lo.getTime() === hi.getTime()
+      ? fmtShort(lo)
+      : `${fmtShort(lo)} – ${fmtShort(hi)}`;
+    hint.textContent = 'Klik Apply atau pilih ulang';
+  }
+}
+
+function applyDate() {
+  if (!selStart) { closeCal(); return; }
+
+  const lo = (!selEnd || selStart <= selEnd) ? selStart : selEnd;
+  const hi = (!selEnd || selStart <= selEnd) ? (selEnd || selStart) : selStart;
+
+  dateFrom = new Date(lo); dateFrom.setHours(0,0,0,0);
+  dateTo   = new Date(hi); dateTo.setHours(23,59,59,999);
+
+  document.getElementById('dateLabel').textContent = dateRangeLabel();
+  document.getElementById('dateTrigger').classList.add('has-date');
+  document.getElementById('dateClear').style.display = 'inline';
+
+  closeCal();
+  loadNews();   // filter tanggal dijalankan di server, jadi harus ambil ulang
+}
+
+function clearDate(reload = true) {
+  dateFrom = null; dateTo = null;
+  selStart = null; selEnd = null;
+  document.getElementById('dateLabel').textContent = 'Pilih tanggal';
+  document.getElementById('dateTrigger').classList.remove('has-date');
+  document.getElementById('dateClear').style.display = 'none';
+  if (reload) loadNews();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════════════
+loadNews();
+</script>
+</body>
+</html>
